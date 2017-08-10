@@ -8,6 +8,7 @@ echo "Setting up PYTHONPATH."
 export PYTHONPATH=/home/ubuntu/duckietown/catkin_ws/src:$PYTHONPATH
 
 echo "Setup ROS_HOSTNAME."
+export HOSTNAME=$HOSTNAME # otherwise it is not exported
 export ROS_HOSTNAME=$HOSTNAME.local
 export DUCKIETOWN_ROOT=$HOME/duckietown
 

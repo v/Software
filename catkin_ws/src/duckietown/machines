@@ -1,0 +1,4 @@
+<launch>
+   <arg name="env_script_path" default="~/duckietown/environment.sh"/>
+   <machine name="$(env HOSTNAME)" address="$(env HOSTNAME).local" user="$(env USER)" />
+</launch>	
