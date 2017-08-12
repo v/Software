@@ -1,26 +1,83 @@
+# -*- coding: utf-8 -*-
 from collections import namedtuple
 
+from termcolor import cprint, colored
+
 from duckietown_utils import logger
-from .list_of_checks import get_checks
+from duckietown_utils.system_cmd_imp import indent_with_label
 from what_the_duck.check import CheckError, CheckFailed
-from duckietown_utils.system_cmd_imp import indent
+
+from .list_of_checks import get_checks
+import sys
+from duckietown_utils.instantiate_utils import indent
+import traceback
 
 
 FAIL = 'check failed'
-ERROR = '*check error*'
+ERROR = 'INVALID TEST'
 OK = 'check passed'
 SKIP = 'skipped'
 statuses = [FAIL, ERROR, OK, SKIP]
 
+VISUALIZE_SYMBOLS = {
+    OK: '✓', #✔',
+    FAIL: '✗',
+    SKIP: 'skip',
+    ERROR: '!', 
+}
+
+
 Result = namedtuple('Result', 'entry status out_short out_long')
 
+WTD = colored('what_the_duck', 'cyan', attrs=['bold'])
+
 def do_all_checks():
+    print("\n%s checks many things about the Duckiebot configuration.\n" % WTD)
     entries = get_checks()
+    print('%s will run %s tests.\n' % (WTD, len(entries))) 
     results = run_checks(entries)
     display_results(results)
-    nfailures = len( [_.status != OK for _ in results] )
-    return nfailures
+    ok = [_ for _ in results if _.status in [OK] ]
+    failed = [_ for _ in results if _.status in [FAIL] ]
+    errored = [_ for _ in results if _.status in [ERROR] ]
+    skipped = [_ for _ in results if _.status in [SKIP] ]
+    nfailures = len(failed + errored)
     
+    print('Summary of results:')
+    
+    print_green('* %d test(s) executed successfully.' % len(ok))
+    if skipped:
+        print_yellow('* %d test(s) were skipped.' % len(skipped))
+    else:
+        print('* No tests were skipped.')
+    
+    if nfailures == 0:
+        print_green('* All tests executed succeeded.')
+        bye()
+        sys.exit(0)
+    else:
+
+        if failed:        
+            print_red('* Found %d failure(s):\n' % len(failed))
+            for f in failed:
+                s = '  - %12s:   %s' % (f.status, f.entry.desc)
+                print_red(s)
+            print_red('')
+            
+        if errored:
+            print_bright_red('* Found %d invalid test(s):\n' % len(errored))
+            for f in errored:
+                s = '  - %12s:   %s' % (f.status, f.entry.desc)
+                print_bright_red(s)
+            print_bright_red('')
+                
+        print_red('\nSee above for details and suggestions.')
+        bye()
+        sys.exit(nfailures)
+
+def bye():
+    print('\nPlease add all tests that can be automated to %s.' % WTD)
+        
 def run_checks(entries):
     """ Returns the names of the failures  """
     results = [] 
@@ -51,13 +108,13 @@ def run_checks(entries):
                 dep_status = get_previous_result_status(only_run_if)
             
                 if dep_status in [FAIL, ERROR]:
-                    msg = "Skipped because dependency %r failed." % (only_run_if.desc)
+                    msg = "Skipped because the previous test %r failed." % (only_run_if.desc)
                     r = Result(entry=entry, status=SKIP, out_short=msg, out_long='')
                     record_result(r)
                     continue
                 
                 elif dep_status in [SKIP]:
-                    msg = "Skipped because dependency %r skipped." % (only_run_if.desc)
+                    msg = "Skipped because the previous test %r skipped." % (only_run_if.desc)
                     r = Result(entry=entry, status=SKIP, out_short=msg, out_long='')
                     record_result(r)
                     continue
@@ -79,7 +136,7 @@ def run_checks(entries):
         except CheckError as e:
             r = Result(entry=entry, status=ERROR, 
                        out_short='Could not run test.',
-                       out_long=str(e))
+                       out_long=e.long_explanation)
             record_result(r)
             
         except CheckFailed as e:
@@ -88,27 +145,66 @@ def run_checks(entries):
                        out_long=e.long_explanation)
             record_result(r)
             
+        except Exception as e:
+            msg = 'Invalid test: it raised the exception %s.' % type(e).__name__
+            l = 'I expect the tests to only raise CheckError or CheckFailed.'
+            l += '\n\nEntire exception:\n\n'
+            l += indent(traceback.format_exc(e), '  ')
+            r = Result(entry=entry, status=ERROR, 
+                       out_short=msg,
+                       out_long=l)
+            record_result(r)
+            
     return results
 
+def print_green(s):
+    cprint(s, 'green')
+
+def print_red(s):
+    cprint(s, 'red')
+
+def print_bright_red(s):
+    cprint(s, 'red', attrs=['bold'])
+        
+def print_yellow(s):
+    cprint(s, 'yellow')
 
 def display_results(results): 
+    def L(s):
+        return s.rjust(20) + '  '
 
     for r in results:
-        s = '%-30s  %s   %s' % (r.entry.desc, r.status, r.out_short)
+        symbol = VISUALIZE_SYMBOLS[r.status]
+        s = '%05s  %s ' % (symbol, r.entry.desc)
         if r.status in [OK]:
-            logger.info(s)
+            print_green(s)
         elif r.status in [FAIL]:
-            logger.error(s)
+            print('')
+            print_red(s)
+            print_red(indent_with_label(r.out_short, L(' failure:')))
+            if r.out_long:
+                print_red(indent_with_label(r.out_long, L('details:')))
             if r.entry.diagnosis is not None:
                 s = str(r.entry.diagnosis)
-                label = 'diagnosis:  '
-                s = indent(s , " "*len(label), label)
+                s = indent_with_label(s, L('diagnosis:'))
                 print(s)
-#                 logger.warn(str(r.entry.diagnosis))
+            for resolution in r.entry.resolutions:
+                s = str(resolution)
+                s = indent_with_label(s, L('resolution:'))
+                print(s)
+            print('')
         elif r.status in [ERROR]:
-            logger.error(s)
+            print_bright_red(s)
+            print_bright_red(indent_with_label(r.out_short, L(' error:')))
+            if r.out_long:
+                print_bright_red(indent_with_label(r.out_long, L('details:')))
+            print('')
         elif r.status in [SKIP]:
-            logger.debug(s)
+            print_yellow(s)
+            print_yellow(indent_with_label(r.out_short, L(' reason:')))
+            if r.out_long:
+                print_yellow(indent_with_label(r.out_long, L('details:')))
+            print('')
         else:
             assert False, r.status
             

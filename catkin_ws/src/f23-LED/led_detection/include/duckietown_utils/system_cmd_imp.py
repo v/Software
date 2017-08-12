@@ -194,12 +194,37 @@ def result_format(cwd, cmd, ret, stdout=None, stderr=None):
     if stderr is not None:
         msg += '\n' + wrap('stderr', stderr)
     return msg
-    
-def indent(s, prefix):
+#     
+# def indent(s, prefix):
+#     lines = s.split('\n')
+#     lines = ['%s%s' % (prefix, line.rstrip()) for line in lines]
+#     return '\n'.join(lines)
+#  
+
+def indent(s, prefix, first=None):
+    s = str(s)
+    assert isinstance(prefix, str)
     lines = s.split('\n')
-    lines = ['%s%s' % (prefix, line.rstrip()) for line in lines]
-    return '\n'.join(lines)
- 
+    if not lines: return ''
+
+    if first is None:
+        first= prefix
+
+    m = max(len(prefix), len(first))
+
+    prefix = ' ' * (m-len(prefix)) + prefix
+    first = ' ' * (m-len(first)) +first
+
+    # differnet first prefix
+    res = ['%s%s' % (prefix, line.rstrip()) for line in lines]
+    res[0] = '%s%s' % (first, lines[0].rstrip())
+    return '\n'.join(res)
+
+def indent_with_label(s, first):
+    prefix = ' ' * len(first)
+    return indent(s, prefix, first)
+    
+    
 
 @contract(cmds='list(str)')
 def copyable_cmd(cmds):

@@ -9,6 +9,7 @@ setup_args = generate_distutils_setup(
 	'what_the_duck', 
 	'duckietown_utils',
     ],
+    install_requires=['termcolor'],
     package_dir={'': 'include'},
 )
 setup(**setup_args)

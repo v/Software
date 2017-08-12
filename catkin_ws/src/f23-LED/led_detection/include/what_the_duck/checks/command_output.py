@@ -7,7 +7,7 @@ __all__ = ['CommandOutputContains']
 
 class CommandOutputContains(Check):
     """ Checks that the command given returns 0
-        and the output contain a certain string. """
+        and the output contains a certain string. """
     def __init__(self, cmd, substring, cwd=None):
         self.cmd = cmd
         self.cwd = cwd

@@ -8,3 +8,9 @@ from .package_import import *
 from .passwordless import *
 from .permissions import *
 from .file_contains import *
+from .environment_variable import *
+from .wifi import *
+from .hostname import *
+from .shells import *
+from .github import *
+from .internet_connected import *

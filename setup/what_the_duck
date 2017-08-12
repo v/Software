@@ -9,15 +9,7 @@ def all_checks():
         sys.stderr.write('Could not import duckietown_utils and what_the_duck packages:\n%s\n' % e)
         sys.exit(255)
     
-    nfailures = do_all_checks()
-
-    if nfailures == 0:
-        logger.info('Everything went well.')
-        sys.exit(0)
-    else:
-        logger.error('what_the_duck obtained %d failures.' % nfailures)
-        sys.exit(nfailures)
-
+    do_all_checks()
 
 if __name__ == '__main__':
     all_checks()

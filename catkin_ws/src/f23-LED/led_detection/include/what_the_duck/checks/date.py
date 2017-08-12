@@ -1,6 +1,6 @@
-from what_the_duck.check import CheckFailed
+from what_the_duck.check import CheckFailed, Check
 
-class CheckDate():
+class CheckDate(Check):
     def __init__(self):
         pass
     

@@ -1,10 +1,12 @@
 import os
 import stat
 
-from what_the_duck.check import CheckFailed, CheckError
+from what_the_duck.check import CheckFailed, CheckError, Check
+from what_the_duck.resolution import Suggestion
+from what_the_duck.checks.fileutils import expand_all
 
 
-class CheckPermissions():
+class CheckPermissions(Check):
     def __init__(self, filename, expected):
         if not isinstance(expected, str) or len(expected) != 4:
             msg = 'Expected "expected" to be a 4-digit string octal ("0700")'
@@ -14,9 +16,10 @@ class CheckPermissions():
         self.expected = expected
         
     def check(self):
-        fn = os.path.expanduser(self.filename)
+        fn = expand_all(self.filename)
+        
         if not os.path.exists(fn):
-            msg = 'Cannot check permissions if file does not exist.'
+            msg = 'Cannot check permissions if file or dir does not exist.'
             raise CheckError(msg)
         
         fstats = os.stat(fn)
@@ -24,43 +27,15 @@ class CheckPermissions():
         if len(filemode) > 4:
             filemode = filemode[-4:]
         if filemode != self.expected:
-            msg = ('Expected mode %r, obtained %r for %s' % 
-                   (self.expected, filemode, fn))
+            msg = ('Expected mode %r, obtained %r.' % 
+                   (self.expected, filemode))
             raise CheckFailed(msg)
             
-#         logger.info('%s = %s' % (fn, filemode))
-    
-#     
-#     stat.S_IRWXU
-# 
-# stat.S_IRUSR
-# Owner has read permission.
-# 
-# stat.S_IWUSR
-# Owner has write permission.
-# 
-# stat.S_IXUSR
-# Owner has execute permission.
-# 
-# stat.S_IRWXG
-# Mask for group permissions.
-# 
-# stat.S_IRGRP
-# Group has read permission.
-# 
-# stat.S_IWGRP
-# Group has write permission.
-# 
-# stat.S_IXGRP
-# Group has execute permission.
-# 
-# stat.S_IRWXO
-# Mask for permissions for others (not in group).
-# 
-# stat.S_IROTH
-# Others have read permission.
-# 
-# stat.S_IWOTH
-# Others have write permission.
-# 
-# stat.S_IXOTH
+    def get_suggestion(self):
+        msg = """
+You can fix the permissions using:
+
+    $ chmod %s %s
+        """ % (self.expected, self.filename)
+        return Suggestion(msg)
+        
