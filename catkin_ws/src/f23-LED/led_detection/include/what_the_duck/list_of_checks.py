@@ -212,18 +212,18 @@ You will need to add the option, and also remove the "~/.ssh/known_hosts" file.
         Diagnosis("DUCKIETOWN_ROOT is set but it points to a non-existing directory.")
         )
     
-    duckieteam_root_var = add(None,
-        'Environment variable DUCKIETEAM_ROOT',
-        EnvironmentVariableExists('DUCKIETEAM_ROOT'),
-        Diagnosis("DUCKIETEAM_ROOT is not set."),
-        Suggestion('You have not run the environment script.'))
-    
-    add(duckieteam_root_var,
-        '${DUCKIETEAM_ROOT} exists',
-        DirExists('${DUCKIETEAM_ROOT}'),
-        Diagnosis("DUCKIETEAM_ROOT is set but it points to a non-existing directory.")
-        )
-    
+    if False: # future
+        duckieteam_root_var = add(None,
+            'Environment variable DUCKIETEAM_ROOT',
+            EnvironmentVariableExists('DUCKIETEAM_ROOT'),
+            Diagnosis("DUCKIETEAM_ROOT is not set."))
+        
+        add(duckieteam_root_var,
+            '${DUCKIETEAM_ROOT} exists',
+            DirExists('${DUCKIETEAM_ROOT}'),
+            Diagnosis("DUCKIETEAM_ROOT is set but it points to a non-existing directory.")
+            )
+        
     if not on_duckiebot():
         add(None,
             'Environment variable DUCKIETOWN_DATA',
@@ -237,19 +237,21 @@ The environment variable DUCKIETOWN_DATA must either:
 """                  
                   ))
     
-    if on_duckiebot():
-        add(None,
-            'Environment variable VEHICLE_NAME',
-            EnvironmentVariableExists('VEHICLE_NAME'),
-            Diagnosis("""
-The environment variable VEHICLE_NAME must be the name of your robot
-(if you are on the robot)."""),
-            Suggestion("""
-Add this line to ~/.bashrc: 
-
-    export VEHICLE_NAME= (your vehicle name)
-"""))
+    if False:
+        # TODO: not sure if this is needed
+        if on_duckiebot():
+            add(None,
+                'Environment variable VEHICLE_NAME',
+                EnvironmentVariableExists('VEHICLE_NAME'),
+                Diagnosis("""
+    The environment variable VEHICLE_NAME must be the name of your robot
+    (if you are on the robot)."""),
+                Suggestion("""
+    Add this line to ~/.bashrc: 
     
+        export VEHICLE_NAME= (your vehicle name)
+    """))
+        
     # make sure we resolve the paths  
     # /opt/ros/kinetic/bin/roslaunch
     

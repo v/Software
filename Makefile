@@ -32,7 +32,10 @@ build:
 # Teddy: make it so "make unittests" runs all unit tests
 
 unittests-environment: $(machines)
-	bash -c "source environment.sh; source set_vehicle_name.sh; python setup/sanity_checks"
+	echo "Removed - try `make what-the-duck`"
+
+what-the-duck:
+	bash -c "source environment.sh; source set_vehicle_name.sh; python setup/what_the_duck"
 
 unittests:
 	$(MAKE) unittests-environment

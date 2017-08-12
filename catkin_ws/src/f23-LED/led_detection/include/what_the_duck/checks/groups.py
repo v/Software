@@ -50,7 +50,7 @@ You can correct this by adding yourself to the group, with the command:
             l += '    $ groups '
             raise CheckFailed(msg, l)    
     
-    
+
 class YouAreNotUser(Check):
     def __init__(self, username):
         self.username = username
