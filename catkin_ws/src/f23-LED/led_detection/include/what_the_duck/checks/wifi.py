@@ -23,7 +23,7 @@ class WifiNameConfigured(Check):
             raise CheckError(msg)
         
         if initial in res.stdout:
-            msg = 'WiFi is not configured correctly.'
+            msg = 'The robot is creating a network %r.' % initial
             l = 'According to iwconfig, you are creating a network %r.' % initial
             l += '\nThis means that you have failed to properly configure the robot.'
             l += '\nIt is likely the people around you are trying to connect to your robot.'

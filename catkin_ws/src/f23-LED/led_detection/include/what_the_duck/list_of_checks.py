@@ -21,7 +21,13 @@ def get_checks():
                   only_run_if=only_run_if)
         entries.append(E)
         return E
-    
+
+    SSH_DIR = '~/.ssh'
+    SSH_CONFIG = '~/.ssh/config'
+    AUTHORIZED_KEYS = '~/.ssh/authorized_keys'
+    GIT_CONFIG = '~/.gitconfig'
+    JOY_DEVICE = '/dev/input/js0'
+
     add(None,
         "Camera is detected",
         CommandOutputContains('sudo vcgencmd get_camera', 'detected=1'),
@@ -64,53 +70,80 @@ def get_checks():
         Diagnosis("You are not authorized to use the joystick."))
     
     add(not_ubuntu,
+        "Member of group video",
+        YouBelongToGroup("video"),
+        Diagnosis("You are not authorized to read from the camera device."))
+     
+    add(not_ubuntu,
         "Member of group i2c",
         YouBelongToGroup("input"),
         Diagnosis("You are not authorized to use the motor shield."))
-
+    
     ssh_is_there = add(not_ubuntu,\
-        "~/.ssh/ exists",
-        DirExists('~/.ssh'),
+        "%s exists" % SSH_DIR,
+        DirExists(SSH_DIR),
         Diagnosis("SSH config dir does not exist."))
 
     add(ssh_is_there,
-        "~/.ssh/ permissions",
-        CheckPermissions('~/.ssh', '0700'),
+        SSH_DIR + " permissions",
+        CheckPermissions(SSH_DIR, '0700'),
         Diagnosis("SSH directory has wrong permissions.")
         )
 
     ssh_config_exists = add(ssh_is_there,
-        "~/.ssh/config exists",
-        FileExists('~/.ssh/config'),
+        "%s exists" % SSH_CONFIG,
+        FileExists(SSH_CONFIG),
         Diagnosis("SSH config does not exist."))
+    
+    add(None,
+        "SSH option HostKeyAlgorithms is set",
+        FileContains(SSH_CONFIG, "HostKeyAlgorithms ssh-rsa"),
+        Diagnosis("""
+You did not follow the SSH instructions. 
+
+The option "HostKeyAlgorithms ssh-rsa" is necessary for remote
+roslaunch to work. Otherwise it fails because of a limitation
+of the Paramiko library.
+
+See the discussion here:
+
+    https://answers.ros.org/question/41446/a-is-not-in-your-ssh-known_hosts-file/ 
+ 
+"""), Suggestion("""
+You will need to add the option, and also remove the "~/.ssh/known_hosts" file.
+(See discussion above for the why.)
+
+"""))
+
     
     identity_file = add(ssh_config_exists,
         "At least one key is configured.",
-        FileContains('~/.ssh/config', 'IdentityFile'),
+        FileContains(SSH_CONFIG, 'IdentityFile'),
         Diagnosis('You have not enabled any SSH key.'))
-
+     
     add(ssh_is_there,
-        "~/.ssh/authorized_keys exists",
-        FileExists('~/.ssh/authorized_keys'),
+        AUTHORIZED_KEYS + " exists",
+        FileExists(AUTHORIZED_KEYS),
         Diagnosis("You did not setup the SSH authorized keys."))
  
     gitconfig = add(None,
                     "Git configured",
-                    FileExists('~/.gitconfig'),
+                    FileExists(GIT_CONFIG),
                     Diagnosis("You did not do the local Git configuration."))
+    
     add(gitconfig, 
         "Git email set",
-        FileContains("~/.gitconfig", "email ="),
+        FileContains(GIT_CONFIG, "email ="),
         Diagnosis("You did not configure your email for Git."))
 
     add(gitconfig, 
         "Git name set",
-        FileContains("~/.gitconfig", "name ="),
+        FileContains(GIT_CONFIG, "name ="),
         Diagnosis("You did not configure your name for Git."))
 
     add(gitconfig, 
-        "Git polish set",
-        FileContains("~/.gitconfig", "[push]"),
+        "Git push policy set",
+        FileContains(GIT_CONFIG, "[push]"),
         Diagnosis("You did not configure the push policy for Git."))
         
     add(None,
@@ -134,11 +167,6 @@ def get_checks():
         Diagnosis('You have been messing with the kernel.'),
         Suggestion('You probably need to start with a pristine SD card.'))
     
-    add(None,\
-        "~/duckieteam/ exists",
-        DirExists('~/duckieteam'),
-        Diagnosis("You do not have a duckieteam directory."))
-
 
     add(None,
         'Wifi name configured',
@@ -149,7 +177,6 @@ def get_checks():
         "Messages are compiled",
         CheckImportMessages(),
         Diagnosis("The messages are not compiling correctly."))
-
    
     add(None,
         'Shell is bash',
@@ -169,10 +196,33 @@ def get_checks():
         Diagnosis('You have not successfully setup the Github access.'))
 
     add(None,
+        "Joystick detected",
+        DeviceExists(JOY_DEVICE),
+        Diagnosis("The joystick is not found at %s" % JOY_DEVICE))
+    
+    duckietown_root_var = add(None,
         'Environment variable DUCKIETOWN_ROOT',
         EnvironmentVariableExists('DUCKIETOWN_ROOT'),
         Diagnosis("DUCKIETOWN_ROOT is not set."),
         Suggestion('You have not run the environment script.'))
+    
+    add(duckietown_root_var,
+        '${DUCKIETOWN_ROOT} exists',
+        DirExists('${DUCKIETOWN_ROOT}'),
+        Diagnosis("DUCKIETOWN_ROOT is set but it points to a non-existing directory.")
+        )
+    
+    duckieteam_root_var = add(None,
+        'Environment variable DUCKIETEAM_ROOT',
+        EnvironmentVariableExists('DUCKIETEAM_ROOT'),
+        Diagnosis("DUCKIETEAM_ROOT is not set."),
+        Suggestion('You have not run the environment script.'))
+    
+    add(duckieteam_root_var,
+        '${DUCKIETEAM_ROOT} exists',
+        DirExists('${DUCKIETEAM_ROOT}'),
+        Diagnosis("DUCKIETEAM_ROOT is set but it points to a non-existing directory.")
+        )
     
     if not on_duckiebot():
         add(None,
@@ -199,7 +249,13 @@ Add this line to ~/.bashrc:
 
     export VEHICLE_NAME= (your vehicle name)
 """))
-
-     
+    
+    # make sure we resolve the paths  
+    # /opt/ros/kinetic/bin/roslaunch
+    
+    # not installed:
+    # python-roslaunch
+    
+    # DISPLAY is not set
     return entries
 

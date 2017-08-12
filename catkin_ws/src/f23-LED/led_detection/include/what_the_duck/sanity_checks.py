@@ -60,8 +60,11 @@ def do_all_checks():
         if failed:        
             print_red('* Found %d failure(s):\n' % len(failed))
             for f in failed:
-                s = '  - %12s:   %s' % (f.status, f.entry.desc)
-                print_red(s)
+                s = '  - %12s: %s: %s' % (
+                    colored(f.status, 'red'), 
+                    f.entry.desc, 
+                    colored(f.out_short, 'red'))
+                print(s)
             print_red('')
             
         if errored:
@@ -188,11 +191,13 @@ def display_results(results):
                 s = str(r.entry.diagnosis)
                 s = indent_with_label(s, L('diagnosis:'))
                 print(s)
+                print('')
             for resolution in r.entry.resolutions:
                 s = str(resolution)
                 s = indent_with_label(s, L('resolution:'))
                 print(s)
-            print('')
+                print('')
+            
         elif r.status in [ERROR]:
             print_bright_red(s)
             print_bright_red(indent_with_label(r.out_short, L(' error:')))
