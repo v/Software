@@ -158,9 +158,10 @@ You will need to add the option, and also remove the "~/.ssh/known_hosts" file.
 
     if this_is_a_laptop:
         required_packages.update(make_list("""
-            
+            git-lfs
         """))
-        
+    
+    # TODO
     suggested = ['emacs', 'zsh', 'nethogs']
     
     for p in required_packages:
