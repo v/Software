@@ -9,7 +9,7 @@ class DuckietownConstants():
     
     # inside DUCKIEFLEET_ROOT
     scuderia_filename = 'scuderia.yaml'
-    
+    machines_path_rel_to_root = 'catkin_ws/src/core/duckietown/machines'
     
     enforce_no_tabs = False
     enforce_naming_conventions = False
@@ -26,7 +26,7 @@ def get_duckiefleet_root():
 def get_machines_files_path():
     ''' Gets the path to the machines files. It might not exist. '''
     duckietown_root = get_duckietown_root()
-    machines = os.path.join(duckietown_root, 'catkin_ws/src/duckietown/machines')
+    machines = os.path.join(duckietown_root, DuckietownConstants.machines_path_rel_to_root)
     return machines
 
 def get_catkin_ws_src():
