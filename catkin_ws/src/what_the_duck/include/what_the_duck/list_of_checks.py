@@ -286,7 +286,8 @@ You will need to add the option, and also remove the "~/.ssh/known_hosts" file.
     git_lfs_installed = add(None,  # @UnusedVariable
                             'Git LFS installed',
                             GitLFSInstalled(),
-                            Diagnosis('You have not installed Git LFS'))
+                            Diagnosis('You have not installed Git LFS'),
+                            SeeDocs('git-lfs'))
     
     ok_scuderia = add(scuderia_exists,
         'Validation of scuderia file',
