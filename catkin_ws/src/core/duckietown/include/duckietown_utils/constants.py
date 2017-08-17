@@ -2,6 +2,7 @@ from duckietown_utils.path_utils import expand_all
 from duckietown_utils.exceptions import DTConfigException
 import os
 from collections import OrderedDict
+from duckietown_utils.locate_files_impl import locate_files
 
 class DuckietownConstants():
     DUCKIETOWN_ROOT_variable = 'DUCKIETOWN_ROOT'
@@ -43,12 +44,17 @@ def get_list_of_packages_in_catkin_ws():
         Raises DTConfigException if $DUCKIETOWN_ROOT is not set.
     """
     src = get_catkin_ws_src()
-    entries = sorted(os.listdir(src))
-    results = OrderedDict()
-    for entry in entries:
-        dn = os.path.join(src, entry)
-        if os.path.isdir(dn):
-            results[entry] = dn
+    package_files = locate_files(src, 'package.xml')
+    results = {}
+    for p in package_files:
+        dn = os.path.dirname(p)
+        entry = os.path.basename(dn)
+        results[entry] = dn
+        
+    if not 'duckietown' in results:
+        raise ValueError('Could not find duckietown')
+    if not 'what_the_duck' in results:
+        raise ValueError('Could not find what_the_duck') 
     return results
     
 
