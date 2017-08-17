@@ -16,6 +16,7 @@ class PythonPackageCheck(Check):
             for filename in python_files:
                 try:
                     check_no_tabs(filename)
+                    check_no_half_merges(filename)
                 except CheckFailed as e:
                     msg = 'Check failed for file %s:' % filename
                     raise_wrapped(CheckFailed, e, msg, compact=True)
@@ -24,6 +25,12 @@ class PythonPackageCheck(Check):
             l = str(e)
             raise CheckFailed(msg, l)
             
+def check_no_half_merges(filename):
+    contents = open(filename).read()
+    if ('<' * 4 in contents) or ('>'*4 in contents):
+        msg = 'It loooks like this file has been half-merged.' 
+        raise CheckFailed(msg)
+
 
 def check_no_tabs(filename):
     # Things to check:
