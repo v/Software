@@ -14,14 +14,14 @@ import time
 
 class LaneFilterNode(object):
     """
-    
+
 Lane Filter Node
 
 Author: Liam Paull
 
 Inputs: SegmentList from line detector
 
-Outputs: LanePose - the d (lateral displacement) and phi (relative angle) 
+Outputs: LanePose - the d (lateral displacement) and phi (relative angle)
 of the car in the lane
 
 For more info on algorithm and parameters please refer to the google doc:
@@ -32,7 +32,7 @@ For more info on algorithm and parameters please refer to the google doc:
         self.node_name = "Lane Filter"
         self.active = True
         self.updateParams(None)
-        
+
         self.d,self.phi = np.mgrid[self.d_min:self.d_max:self.delta_d,self.phi_min:self.phi_max:self.delta_phi]
         self.beliefRV=np.empty(self.d.shape)
         self.initializeBelief()
@@ -62,7 +62,7 @@ For more info on algorithm and parameters please refer to the google doc:
         self.pub_lane_pose  = rospy.Publisher("~lane_pose", LanePose, queue_size=1)
         self.pub_belief_img = rospy.Publisher("~belief_img", Image, queue_size=1)
         self.pub_entropy    = rospy.Publisher("~entropy",Float32, queue_size=1)
-    	#self.pub_prop_img = rospy.Publisher("~prop_img", Image, queue_size=1)
+        #self.pub_prop_img = rospy.Publisher("~prop_img", Image, queue_size=1)
         self.pub_in_lane    = rospy.Publisher("~in_lane",BoolStamped, queue_size=1)
         self.sub_switch = rospy.Subscriber("~switch", BoolStamped, self.cbSwitch, queue_size=1)
 
@@ -134,7 +134,7 @@ For more info on algorithm and parameters please refer to the google doc:
             i = floor((d_i - self.d_min)/self.delta_d)
             j = floor((phi_i - self.phi_min)/self.delta_phi)
 
-            if self.use_distance_weighting:           
+            if self.use_distance_weighting:
                 dist_weight = self.dwa*l_i**3+self.dwb*l_i**2+self.dwc*l_i+self.zero_val
                 if dist_weight < 0:
                     continue
@@ -166,7 +166,7 @@ For more info on algorithm and parameters please refer to the google doc:
         bridge = CvBridge()
         belief_img = bridge.cv2_to_imgmsg((255*self.beliefRV).astype('uint8'), "mono8")
         belief_img.header.stamp = segment_list_msg.header.stamp
-        
+
         max_val = self.beliefRV.max()
         self.lanePose.in_lane = max_val > self.min_max and len(segment_list_msg.segments) > self.min_segs and np.linalg.norm(measurement_likelihood) != 0
         self.pub_lane_pose.publish(self.lanePose)
@@ -189,7 +189,7 @@ For more info on algorithm and parameters please refer to the google doc:
     def updateVelocity(self,twist_msg):
         self.v_current = twist_msg.v
         self.w_current = twist_msg.omega
-        
+
         #self.v_avg = (self.v_current + self.v_last)/2.0
         #self.w_avg = (self.w_current + self.w_last)/2.0
 
@@ -228,10 +228,10 @@ For more info on algorithm and parameters please refer to the google doc:
             return
         self.beliefRV = s_beliefRV/np.sum(s_beliefRV)
 
-    	#bridge = CvBridge()
+        #bridge = CvBridge()
         #prop_img = bridge.cv2_to_imgmsg((255*self.beliefRV).astype('uint8'), "mono8")
         #self.pub_prop_img.publish(prop_img)
-                
+
         return
 
     def updateBelief(self,measurement_likelihood):

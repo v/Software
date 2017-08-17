@@ -66,19 +66,19 @@ print forward_kinematics.propagate(0,0,0,3*pi/2,1)
 print forward_kinematics.propagate(0,0,0,2*pi,1)
 print forward_kinematics.propagate(0,1,0,-pi,1)
 
-		#print 'd_L:', d_L
-		#print 'd_R:', d_R
-		#print 'dt:', dt
-		#print 'x_axis_pose_delta:', x_axis_pose_delta
-		#print 'y_axis_pose_delta:', y_axis_pose_delta
-		#print 'theta_angle_pose_delta:', theta_angle_pose_delta
-		#print 'theta_dot:', theta_dot
-		#print 'abs_theta_angle_pose_delta:', abs_theta_angle_pose_delta
-		#print 'c:', c
-		#print 'r:', r
-		#print 's:', s
-		#print 'v:', v
-		#print 'Fi_v:', Fi_v
-		#print 'Fi_theta_dot:', Fi_theta_dot
-		#print 'v_weights:',v_weights
-		#print 'theta_dot_weights:',theta_dot_weights
+        #print 'd_L:', d_L
+        #print 'd_R:', d_R
+        #print 'dt:', dt
+        #print 'x_axis_pose_delta:', x_axis_pose_delta
+        #print 'y_axis_pose_delta:', y_axis_pose_delta
+        #print 'theta_angle_pose_delta:', theta_angle_pose_delta
+        #print 'theta_dot:', theta_dot
+        #print 'abs_theta_angle_pose_delta:', abs_theta_angle_pose_delta
+        #print 'c:', c
+        #print 'r:', r
+        #print 's:', s
+        #print 'v:', v
+        #print 'Fi_v:', Fi_v
+        #print 'Fi_theta_dot:', Fi_theta_dot
+        #print 'v_weights:',v_weights
+        #print 'theta_dot_weights:',theta_dot_weights

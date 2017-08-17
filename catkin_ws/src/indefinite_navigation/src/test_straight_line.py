@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import rospy
-from intersection_control.util import HelloGoodbye #Imports module. Not limited to modules in this pkg. 
+from intersection_control.util import HelloGoodbye #Imports module. Not limited to modules in this pkg.
 from duckietown_msgs.msg import LanePose, StopLineReading
 
 from std_msgs.msg import String #Imports msg
@@ -12,10 +12,10 @@ class IndefNavigationNode(object):
     def __init__(self):
         # Save the name of the node
         self.node_name = rospy.get_name()
-        
+
         rospy.loginfo("[%s] Initialzing." %(self.node_name))
-	veh_name= rospy.get_param("veh")['duckiebot_visualizer']['veh_name']
-	wheel_topic = "/" + veh_name + "/joy_mapper_node/car_cmd"
+        veh_name= rospy.get_param("veh")['duckiebot_visualizer']['veh_name']
+        wheel_topic = "/" + veh_name + "/joy_mapper_node/car_cmd"
         lane_topic = "/" + veh_name + "/lane_filter_node/lane_pose"
         stop_topic = "/" + veh_name + "/stop_line_filter_node/stop_line_reading"
 
@@ -24,8 +24,8 @@ class IndefNavigationNode(object):
         self.forward_time = 4.8
 
         self.pub_wheels_cmd = rospy.Publisher(wheel_topic,Twist2DStamped, queue_size=1)
-        self.sub_lane = rospy.Subscriber(lane_topic, LanePose, self.cbLane, queue_size=1) 
-        self.sub_stop = rospy.Subscriber(stop_topic, StopLineReading, self.cbStop, queue_size=1) 
+        self.sub_lane = rospy.Subscriber(lane_topic, LanePose, self.cbLane, queue_size=1)
+        self.sub_stop = rospy.Subscriber(stop_topic, StopLineReading, self.cbStop, queue_size=1)
 
         rospy.loginfo("[%s] Initialzed." %(self.node_name))
 
@@ -46,7 +46,7 @@ class IndefNavigationNode(object):
         if self.lane==None or self.stop == None:
             rospy.loginfo("could not subscribe to lane and stop line")
             return
-        
+
         #Measured dist for stop as 146+8cm cm physically
         self.init = self.lane, -1.54
         forward_for_time = self.forward_time
@@ -56,14 +56,14 @@ class IndefNavigationNode(object):
             wheels_cmd_msg.header.stamp = rospy.Time.now()
             wheels_cmd_msg.v = 0.5
             wheels_cmd_msg.omega = 0.0
-            self.pub_wheels_cmd.publish(wheels_cmd_msg)    
+            self.pub_wheels_cmd.publish(wheels_cmd_msg)
             #rospy.loginfo("Moving?.")
             self.rate.sleep()
         self.final = self.lane, self.stop
         self.calculate()
 
     def calculate(self):
-        
+
         init_d = self.init[0].d
         init_phi = self.init[0].phi
 
@@ -88,7 +88,7 @@ class IndefNavigationNode(object):
         info = """
         LANE OFFSET SUMMARY
         ===================
-        initial location is (%.4f, %.4f), 
+        initial location is (%.4f, %.4f),
         final location is (%.4f, %.4f).
 
         distance offset = %.4f
@@ -121,4 +121,3 @@ if __name__ == '__main__':
     node = IndefNavigationNode()
     raw_input("drive forward?")
     node.driveForward()
-

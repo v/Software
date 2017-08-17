@@ -64,9 +64,9 @@ class Pot:
         value = 0.0
 
         if rawSensor > self.__potMax:
-            #warnings.warn("Pot measuremens out of bounds.") 
+            #warnings.warn("Pot measuremens out of bounds.")
             return 1.0
-        if rawSensor < self.__potMin: 
+        if rawSensor < self.__potMin:
             #warnings.warn("Pot measuremens out of bounds.")
             return -1.0
 
@@ -76,6 +76,3 @@ class Pot:
             value = float(rawSensor - self.__potZero) / (self.__potZero - self.__potMin)
 
         return value
-
-    
-	

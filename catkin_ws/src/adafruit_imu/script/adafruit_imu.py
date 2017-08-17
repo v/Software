@@ -20,7 +20,7 @@ class AdafruitIMU(object):
         self.node_name = rospy.get_name()
         rospy.loginfo("[%s] Initializing " %(self.node_name))
 
-        # Setup compass and accelerometer        
+        # Setup compass and accelerometer
         self.compass_accel = Adafruit_LSM303()
 
         # Setup gyroscope
@@ -48,28 +48,28 @@ class AdafruitIMU(object):
         compass = compass_accel[0:3]
         accel = compass_accel[3:6]
         gyro = self.gyro.read()
-        
+
         # Put together an IMU message
-	imu_msg = Imu()
-	imu_msg.header.stamp = rospy.Time.now()
+        imu_msg = Imu()
+        imu_msg.header.stamp = rospy.Time.now()
         imu_msg.orientation_covariance[0] = -1
         imu_msg.angular_velocity = gyro[0] * DEG_TO_RAD
         imu_msg.angular_velocity = gyro[1] * DEG_TO_RAD
         imu_msg.angular_velocity = gyro[2] * DEG_TO_RAD
-	imu_msg.linear_acceleration.x = accel[0] * G
-	imu_msg.linear_acceleration.y = accel[1] * G
-	imu_msg.linear_acceleration.z = accel[2] * G
-    
-	self.pub_imu.publish(imu_msg)
+        imu_msg.linear_acceleration.x = accel[0] * G
+        imu_msg.linear_acceleration.y = accel[1] * G
+        imu_msg.linear_acceleration.z = accel[2] * G
+
+        self.pub_imu.publish(imu_msg)
 
         # Put together a magnetometer message
-	mag_msg = MagneticField()
-	mag_msg.header.stamp = rospy.Time.now()
+        mag_msg = MagneticField()
+        mag_msg.header.stamp = rospy.Time.now()
         mag_msg.magnetic_field.x = compass[0]
         mag_msg.magnetic_field.y = compass[1]
         mag_msg.magnetic_field.z = compass[2]
-    
-	self.pub_mag.publish(mag_msg)
+
+        self.pub_mag.publish(mag_msg)
 
 if __name__ == "__main__":
     rospy.init_node("Adafruit_IMU", anonymous=False)

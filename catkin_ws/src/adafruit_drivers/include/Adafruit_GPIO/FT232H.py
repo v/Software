@@ -182,9 +182,9 @@ class FT232H(GPIO.BaseGPIO):
         # Get modem status. Useful to enable for debugging.
         #ret, status = ftdi.poll_modem_status(self._ctx)
         #if ret == 0:
-        #	logger.debug('Modem status {0:02X}'.format(status))
+        # logger.debug('Modem status {0:02X}'.format(status))
         #else:
-        #	logger.debug('Modem status error {0}'.format(ret))
+        # logger.debug('Modem status error {0}'.format(ret))
         length = len(string)
         ret = ftdi.write_data(self._ctx, string, length)
         # Log the string that was written in a python hex string format using a very

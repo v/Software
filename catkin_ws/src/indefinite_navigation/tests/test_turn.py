@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy, unittest, rostest
 import math
-from intersection_control.util import HelloGoodbye #Imports module. Not limited to modules in this pkg. 
+from intersection_control.util import HelloGoodbye #Imports module. Not limited to modules in this pkg.
 from duckietown_msgs.msg import LanePose, StopLineReading
 from std_srvs.srv import Empty, EmptyRequest
 from std_msgs.msg import String #Imports msg
@@ -19,7 +19,7 @@ class IndefNavigationTurnNode(unittest.TestCase):
         rospy.init_node('indef_navigation_turn_node', anonymous=False)
         # Save the name of the node
         self.node_name = rospy.get_name()
-        
+
         rospy.loginfo("[%s] Initialzing." %(self.node_name))
         veh_name= self.setupParam("~veh", "")
         self.type = self.setupParam("~type", 'right')
@@ -32,7 +32,7 @@ class IndefNavigationTurnNode(unittest.TestCase):
         wheels_cmd = "/" + veh_name + "/open_loop_intersection_control_node/car_cmd"
         self.lane = None
         self.done = None
-        
+
         self.publish_mode = rospy.Publisher(mode_topic, FSMState, queue_size=1)
         self.pub_wheels = rospy.Publisher(wheels_cmd, Twist2DStamped, queue_size=1)
         self.sub_lane = rospy.Subscriber(lane_topic, LanePose, self.cbLane, queue_size=1)
@@ -41,10 +41,10 @@ class IndefNavigationTurnNode(unittest.TestCase):
 
         rospy.wait_for_service(left_service)
         self.turn_left_serv = rospy.ServiceProxy(left_service, Empty)
-        
+
         rospy.wait_for_service(right_service)
         self.turn_right_serv = rospy.ServiceProxy(right_service, Empty)
-        
+
         rospy.wait_for_service(forward_service)
         self.turn_forward_serv = rospy.ServiceProxy(forward_service, Empty)
 
@@ -93,7 +93,7 @@ class IndefNavigationTurnNode(unittest.TestCase):
         stop.v = 0
         stop.omega = 0
         startTime = rospy.Time.now()
-	end_time = startTime + rospy.Duration.from_sec(1)
+    end_time = startTime + rospy.Duration.from_sec(1)
         rospy.loginfo("start_time = %s, end_time=%s" %(startTime, end_time))
         while rospy.Time.now() < end_time:
             self.pub_wheels.publish(stop)
@@ -110,16 +110,16 @@ class IndefNavigationTurnNode(unittest.TestCase):
         off_d = abs(init_d - final_d)
         off_phi = abs(init_phi - final_phi)
         result_trim = "FAILED"
-        
+
         if abs(off_d) < 0.08:
             result_trim = "PASSED"
 
         info = """
         TURN RESULT
         ===================
-        Goal location is (%.4f, %.4f), 
+        Goal location is (%.4f, %.4f),
         final location is (%.4f, %.4f).
-        
+
         distance offset = %.4f
         distance angle offset = %.4f
         TURN TEST % s
@@ -135,4 +135,3 @@ if __name__ == '__main__':
     rospy.init_node('indef_navigation_turn_node', anonymous=False)
 
     rostest.rosrun('rostest_turn_calibration', 'indef_navigation_turn_node', IndefNavigationTurnNode)
-
