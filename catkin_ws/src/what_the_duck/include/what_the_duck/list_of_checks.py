@@ -6,6 +6,9 @@ from .detect_environment import on_duckiebot
 from .entry import Diagnosis, Entry
 from duckietown_utils.constants import get_list_of_packages_in_catkin_ws
 from what_the_duck.python_source_checks import PythonPackageCheck
+from what_the_duck.entry import SeeDocs
+from what_the_duck.checks.packages import CheckPackageInstalled,\
+    CheckPackageNotInstalled
 
 
 def get_checks():
@@ -133,6 +136,41 @@ You will need to add the option, and also remove the "~/.ssh/known_hosts" file.
         FileExists(AUTHORIZED_KEYS),
         Diagnosis("You did not setup the SSH authorized keys."))
  
+    required_packages = set()
+    
+    if this_is_a_duckiebot or this_is_a_laptop:
+        required_packages.update(make_list("""
+            vim byobu
+            git git-extras
+            htop atop iftop
+            aptitude apt-file
+            build-essential libblas-dev liblapack-dev libatlas-base-dev gfortran libyaml-cpp-dev
+            python-dev ipython python-sklearn
+            python-termcolor
+            ros-kinetic-desktop-full 
+        """))
+        
+    if this_is_a_duckiebot:
+        required_packages.update(make_list("""
+            i2c-tools
+            python-smbus
+        """))
+
+    if this_is_a_laptop:
+        required_packages.update(make_list("""
+            
+        """))
+        
+    suggested = ['emacs', 'zsh', 'nethogs']
+    
+    for p in required_packages:
+        add(None, p, CheckPackageInstalled(p), Diagnosis('Package %r not installed.' % p))
+    
+    forbidden_packages = ["python-roslaunch"]
+    
+    for p in forbidden_packages:
+        add(None, p, CheckPackageNotInstalled(p), Diagnosis('Forbidden package %r is installed.' % p))
+        
     gitconfig = add(None,
                     "Existence of " + GIT_CONFIG,
                     FileExists(GIT_CONFIG),
@@ -242,6 +280,7 @@ You will need to add the option, and also remove the "~/.ssh/known_hosts" file.
                           'Existence of scuderia file',
                           ScuderiaFileExists(),
                           Diagnosis('You do not have a scuderia file.'),
+                          SeeDocs('scuderia')
                           )
     
     git_lfs_installed = add(None,  # @UnusedVariable
@@ -253,13 +292,15 @@ You will need to add the option, and also remove the "~/.ssh/known_hosts" file.
         'Validation of scuderia file',
         ValidScuderiaFile(),
         Diagnosis('You have an invalid scuderia file.'),
+        SeeDocs('scuderia')
         )
     
     if this_is_a_duckiebot:
         add(scuderia_exists,
             'This robot is mentioned in scuderia.',
             ThisRobotInScuderiaFile(),
-            Diagnosis('You have not added the robot to the scuderia.'))
+            Diagnosis('You have not added the robot to the scuderia.'),
+            SeeDocs('scuderia'))
     
 
     machines_exists = add(ok_scuderia,
@@ -343,4 +384,7 @@ To fix this, run:
     # DISPLAY is not set
     return entries
 
+def make_list(s):
+    return [x for x in s.replace('\n', ' ').split() if x.strip()]
+ 
 
