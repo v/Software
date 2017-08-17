@@ -1,5 +1,6 @@
-from what_the_duck.check import Check, CheckFailed
 from duckietown_utils.system_cmd_imp import system_cmd_result
+from what_the_duck.check import Check, CheckFailed
+
 
 def is_package_installed(package_name):
     if '\n' in package_name or ' ' in package_name:
@@ -14,7 +15,7 @@ def is_package_installed(package_name):
                   capture_keyboard_interrupt=False,
                   env=None)
     
-    return (res.ret == 0) and  ('installed' in res.stdout) 
+    return (res.ret == 0) and ('installed' in res.stdout) 
 
 
 class CheckPackageNotInstalled(Check):

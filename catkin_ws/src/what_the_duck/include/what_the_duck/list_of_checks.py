@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from duckietown_utils import DuckietownConstants
+from duckietown_utils.constants import get_list_of_packages_in_catkin_ws
+from what_the_duck.entry import SeeDocs
+from what_the_duck.python_source_checks import PythonPackageCheck
 
 from .checks import *  # @UnusedWildImport
 from .detect_environment import on_duckiebot
 from .entry import Diagnosis, Entry
-from duckietown_utils.constants import get_list_of_packages_in_catkin_ws
-from what_the_duck.python_source_checks import PythonPackageCheck
-from what_the_duck.entry import SeeDocs
-from what_the_duck.checks.packages import CheckPackageInstalled,\
-    CheckPackageNotInstalled
 
 
 def get_checks():
@@ -63,6 +61,8 @@ def get_checks():
         YouAreNotUser('root'),
         Diagnosis("You should not run the code as root."))
 
+    username = getpass.getuser()
+    
     if this_is_a_duckiebot:
         not_ubuntu=add(not_root,
             "Not running as ubuntu",
@@ -71,23 +71,33 @@ def get_checks():
    
         add(not_ubuntu,
             "Member of group sudo",
-            YouBelongToGroup("sudo"),
+            UserBelongsToGroup(username, "sudo"),
             Diagnosis("You are not authorized to run sudo."))
         
         add(not_ubuntu,
             "Member of group input",
-            YouBelongToGroup("input"),
+            UserBelongsToGroup(username, "input"),
             Diagnosis("You are not authorized to use the joystick."))
         
         add(not_ubuntu,
             "Member of group video",
-            YouBelongToGroup("video"),
+            UserBelongsToGroup(username, "video"),
             Diagnosis("You are not authorized to read from the camera device."))
          
         add(not_ubuntu,
             "Member of group i2c",
-            YouBelongToGroup("input"),
+            UserBelongsToGroup(username, "input"),
             Diagnosis("You are not authorized to use the motor shield."))
+    
+        for g in ['sudo','input','video','i2c']:
+            add(None,
+                "User ubuntu member of group `%s`" % g,
+                UserBelongsToGroup("ubuntu", g),
+                Diagnosis("Image not created properly."))
+            
+        
+        
+        
         
     ssh_is_there = add(None,\
         "%s exists" % SSH_DIR,
@@ -147,7 +157,7 @@ You will need to add the option, and also remove the "~/.ssh/known_hosts" file.
             build-essential libblas-dev liblapack-dev libatlas-base-dev gfortran libyaml-cpp-dev
             python-dev ipython python-sklearn
             python-termcolor
-            ros-kinetic-desktop-full 
+            ros-kinetic-desktop-full  
         """))
         
     if this_is_a_duckiebot:
@@ -304,6 +314,13 @@ You will need to add the option, and also remove the "~/.ssh/known_hosts" file.
             Diagnosis('You have not added the robot to the scuderia.'),
             SeeDocs('scuderia'))
     
+    progs = ['roslaunch', 'rosrun']
+    for prog in progs:
+        add(None,
+            'Good path for roslaunch',
+            CommandOutputContains('which %s' % prog, '/opt/ros/kinetic'),
+            Diagnosis('The program `%s` is not resolved to the one in /opt/ros' % prog))
+    
 
     machines_exists = add(ok_scuderia,
         'Existence of machines file',
@@ -380,8 +397,6 @@ To fix this, run:
     # make sure we resolve the paths  
     # /opt/ros/kinetic/bin/roslaunch
     
-    # not installed:
-    # python-roslaunch
     
     # DISPLAY is not set
     return entries
