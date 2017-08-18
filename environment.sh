@@ -4,6 +4,7 @@
 [ -z "$HOSTNAME" ] && { echo "Need to set HOSTNAME."; exit 3; }
 
 # Do not compile Lisp messages
+# XXX: not sure if this is the place to put this.
 export ROS_LANG_DISABLE=gennodejs:geneus:genlisp:roslisp
 
 echo "Activating ROS..."
