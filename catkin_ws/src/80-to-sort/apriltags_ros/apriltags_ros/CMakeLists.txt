@@ -21,19 +21,20 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(Eigen REQUIRED)
 
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES apriltag_detector
-  CATKIN_DEPENDS apriltags image_transport roscpp sensor_msgs geometry_msgs duckietown_msgs tf cv_bridge message_runtime nodelet std_msgs
-  DEPENDS Eigen
-)
-
 generate_messages(
   DEPENDENCIES
   std_msgs
   sensor_msgs
   geometry_msgs
   duckietown_msgs
+)
+
+
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES apriltag_detector
+  CATKIN_DEPENDS apriltags image_transport roscpp sensor_msgs geometry_msgs duckietown_msgs tf cv_bridge message_runtime nodelet std_msgs
+  DEPENDS Eigen
 )
 
 
