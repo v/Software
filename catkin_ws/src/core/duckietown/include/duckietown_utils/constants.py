@@ -1,7 +1,9 @@
-from duckietown_utils.path_utils import expand_all
-from duckietown_utils.exceptions import DTConfigException
 import os
-from collections import OrderedDict
+
+from duckietown_utils.exceptions import DTConfigException
+from duckietown_utils.locate_files_impl import locate_files
+from duckietown_utils.path_utils import expand_all
+
 
 class DuckietownConstants():
     DUCKIETOWN_ROOT_variable = 'DUCKIETOWN_ROOT'
@@ -9,7 +11,7 @@ class DuckietownConstants():
     
     # inside DUCKIEFLEET_ROOT
     scuderia_filename = 'scuderia.yaml'
-    
+    machines_path_rel_to_root = 'catkin_ws/src/core/duckietown/machines'
     
     enforce_no_tabs = False
     enforce_naming_conventions = False
@@ -26,7 +28,7 @@ def get_duckiefleet_root():
 def get_machines_files_path():
     ''' Gets the path to the machines files. It might not exist. '''
     duckietown_root = get_duckietown_root()
-    machines = os.path.join(duckietown_root, 'catkin_ws/src/duckietown/machines')
+    machines = os.path.join(duckietown_root, DuckietownConstants.machines_path_rel_to_root)
     return machines
 
 def get_catkin_ws_src():
@@ -43,12 +45,17 @@ def get_list_of_packages_in_catkin_ws():
         Raises DTConfigException if $DUCKIETOWN_ROOT is not set.
     """
     src = get_catkin_ws_src()
-    entries = sorted(os.listdir(src))
-    results = OrderedDict()
-    for entry in entries:
-        dn = os.path.join(src, entry)
-        if os.path.isdir(dn):
-            results[entry] = dn
+    package_files = locate_files(src, 'package.xml')
+    results = {}
+    for p in package_files:
+        dn = os.path.dirname(p)
+        entry = os.path.basename(dn)
+        results[entry] = dn
+    # We expect at least these two packages
+    if not 'duckietown' in results:
+        raise ValueError('Could not find duckietown')
+    if not 'what_the_duck' in results:
+        raise ValueError('Could not find what_the_duck') 
     return results
     
 

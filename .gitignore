@@ -7,3 +7,4 @@ catkin_ws/src/duckietown/machines
 .project
 .pydevproject
 .settings/
+catkin_ws/src/core/duckietown/machines
