@@ -164,6 +164,7 @@ You will need to add the option, and also remove the "~/.ssh/known_hosts" file.
         required_packages.update(make_list("""
             i2c-tools
             python-smbus
+            ntpdate
         """))
 
     if this_is_a_laptop:

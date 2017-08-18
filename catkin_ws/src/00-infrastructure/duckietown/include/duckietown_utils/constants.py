@@ -11,7 +11,7 @@ class DuckietownConstants():
     
     # inside DUCKIEFLEET_ROOT
     scuderia_filename = 'scuderia.yaml'
-    machines_path_rel_to_root = 'catkin_ws/src/core/duckietown/machines'
+    machines_path_rel_to_root = 'catkin_ws/src/00-infrastructure/duckietown/machines'
     
     enforce_no_tabs = False
     enforce_naming_conventions = False
