@@ -1,7 +1,9 @@
-# Package `what-the-duck` {#what-the-duck}
+# Package `what_the_duck` {#what_the_duck}
 
 `what-the-duck` is a program that tests *dozens* of configuration
 inconsistencies that can happen on a Duckiebot.
+
+## What the duck {#what-the-duck}
 
 To use it, first compile the repository, and then run:
 

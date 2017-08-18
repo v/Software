@@ -1,4 +1,4 @@
-#  Package `adafruit_imu` {#package-adafruit_imu}
+#  Package `adafruit_imu` {#adafruit_imu}
 
 
 ##  Testing

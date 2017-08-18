@@ -1,4 +1,4 @@
-# Package `pkg_name` {#package-pkg_name}
+# Package `pkg_name` {#pkg_name}
 
 The package `pkg_name` is a template for ROS packages.
 

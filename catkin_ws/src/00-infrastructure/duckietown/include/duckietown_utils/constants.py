@@ -15,6 +15,9 @@ class DuckietownConstants():
     
     enforce_no_tabs = True
     enforce_naming_conventions = True
+    
+    # The rules for good readmes do not apply to these packages
+    good_readme_exceptions = ['apriltags_ros', 'apriltags', 'duckietown', 'isam']
 
     
 def get_duckietown_root():
