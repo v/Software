@@ -1,6 +1,8 @@
+# Package `rgb_led` {#rgb_led}
 
-Demos
------
+TODO: to write
+
+## Demos
 
 To test the traffic light:
 

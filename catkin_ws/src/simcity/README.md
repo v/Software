@@ -1,4 +1,5 @@
-# Simcity - Map Editor Version 0.1
+# Package `simcity` - Map Editor Version 0.1 {#simcity}
+
 All ./ references point to duckietown(Software)/catkin_ws/src/simcity
 A good reference for duckietown packages in general is catkin_ws/src/pkg_name/howto.md
 
@@ -10,14 +11,14 @@ A good reference for duckietown packages in general is catkin_ws/src/pkg_name/ho
 Inside ./launch is basic_map_tiler.launch. Ensure that the map file's path is correct for your machine. We start simcity, given a specific map file. We also start rviz, ROS' common gui.
 
 
-## How to edit the map 
+## How to edit the map
 
 (V0.1)
 
 The map is contained in ./maps as a YAML file. map.yaml is a small example of some circular streets, and censi_map.yaml is the map of the duckietown currently up and running.
 
 
-## What am I looking at, anyway? 
+## What am I looking at, anyway?
 
 (V0.1)
 

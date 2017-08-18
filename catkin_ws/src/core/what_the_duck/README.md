@@ -21,7 +21,7 @@ The documentation about to do that is not ready yet.
 
 ## Tests already added
 
-Here's the list of tests already added:
+Here is the list of tests already added:
 
     ✓  Camera is detected
     ✓  Scipy is installed
@@ -63,6 +63,7 @@ Here's the list of tests already added:
     ✓  Python: No CamelCase
     ✓  Python: No tab chars
     ✓  Python:  No half merges
+
 
 ## List of tests to add
 
