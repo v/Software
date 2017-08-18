@@ -1,4 +1,4 @@
-# Package `joy_mapper`  #{package-joy-mapper}
+# Package `joy_mapper` {#package-joy-mapper}
 
 TODO: to write
 

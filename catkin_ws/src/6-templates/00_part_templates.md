@@ -1,3 +1,3 @@
-# Templates {#part:templates}
+# Packages - Templates {#part:templates}
 
 These are templates.
