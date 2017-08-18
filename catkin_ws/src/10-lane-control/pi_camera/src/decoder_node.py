@@ -5,10 +5,7 @@ import cv2
 import numpy as np
 from sensor_msgs.msg import CompressedImage,Image
 from duckietown_msgs.msg import BoolStamped
-import time
-
-# bridge = CvBridge()
-# publisher = None
+ 
 
 class DecoderNode(object):
     def __init__(self):

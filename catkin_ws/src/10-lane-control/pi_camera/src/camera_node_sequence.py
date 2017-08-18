@@ -1,27 +1,22 @@
 #!/usr/bin/env python
+import rospkg
 import rospy
-import cv2
+import yaml
+import thread
 import io
-import numpy as np
+
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image, CompressedImage, CameraInfo
 from sensor_msgs.srv import SetCameraInfo, SetCameraInfoResponse
 from picamera import PiCamera
 from picamera.array import PiRGBArray
-import time
-import signal
-import sys
-import rospkg
-import os.path
-import yaml
+
 from duckietown_msgs.msg import BoolStamped
-import thread
 
 class CameraNode(object):
     def __init__(self):
         self.node_name = rospy.get_name()
         rospy.loginfo("[%s] Initializing......" %(self.node_name))
-
 
         self.framerate_high = self.setupParam("~framerate_high",30.0)
         self.framerate_low = self.setupParam("~framerate_low",15.0)
@@ -54,8 +49,8 @@ class CameraNode(object):
 
         self.stream = io.BytesIO()
  
-#self.camera.exposure_mode = 'off'
-       # self.camera.awb_mode = 'off'
+        #self.camera.exposure_mode = 'off'
+        # self.camera.awb_mode = 'off'
 
         self.is_shutdown = False
         self.update_framerate = False
@@ -137,7 +132,6 @@ class CameraNode(object):
     def saveCameraInfo(self, camera_info_msg, filename):
         # Convert camera_info_msg and save to a yaml file
         rospy.loginfo("[saveCameraInfo] filename: %s" %(filename))
-        file = open(filename, 'w')
 
         # Converted from camera_info_manager.py
         calib = {'image_width': camera_info_msg.width,
@@ -152,7 +146,8 @@ class CameraNode(object):
         rospy.loginfo("[saveCameraInfo] calib %s" %(calib))
 
         try:
-            rc = yaml.safe_dump(calib, file)
+            f = open(filename, 'w')
+            yaml.safe_dump(calib, f)
             return True
         except IOError:
             return False

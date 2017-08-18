@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 import rospy
-# from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import numpy as np
 from sensor_msgs.msg import CompressedImage
 
-# bridge = CvBridge()
-publisher = None
+class Storage:
+    publisher = None
 
 def cbCImg(msg):
     # cv_image = bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
@@ -19,11 +18,11 @@ def cbCImg(msg):
     # Process image_np
 
     # Publish empty msg for easy hz testing
-    publisher.publish(CompressedImage())
+    Storage.publisher.publish(CompressedImage())
 
 if __name__ == '__main__': 
-    rospy.init_node('cv_test',anonymous=False)
-    publisher = rospy.Publisher("~test",CompressedImage,queue_size=1)
-    sub_img = rospy.Subscriber("camera/image/compressed",CompressedImage,cbCImg)
+    rospy.init_node('cv_test', anonymous=False)
+    Storage.publisher = rospy.Publisher("~test", CompressedImage, queue_size=1)
+    sub_img = rospy.Subscriber("camera/image/compressed", CompressedImage, cbCImg)
     rospy.spin()
 

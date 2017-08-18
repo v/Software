@@ -69,13 +69,9 @@ Here is the list of tests already added:
 
 Please add below any configuration test that can be automated:
 
-* Check that all the `rosX` command
-  resolve to a file`/opt/ros/kinetic/bin/rosX`.
-
-* Make sure that packages such as `python-roslaunch`
-  are not installed. (The user is invited to install it when `roslaunch` is not found!)
-
 * Editor is set to `vim`.
+
+* Syntax on in `~/.vimrc`
 
 * They put the right MAC address in the network configuration
 
