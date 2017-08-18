@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-import rospy
-import numpy as np
+import rospy 
 import math
-from duckietown_msgs.msg import  Twist2DStamped, LanePose
+from duckietown_msgs.msg import Twist2DStamped, LanePose
 
 class lane_controller(object):
     def __init__(self):
@@ -15,7 +14,7 @@ class lane_controller(object):
         self.setGains()
 
         # Publicaiton
-        self.pub_car_cmd = rospy.Publisher("~car_cmd",Twist2DStamped,queue_size=1)
+        self.pub_car_cmd = rospy.Publisher("~car_cmd", Twist2DStamped, queue_size=1)
 
         # Subscriptions
         self.sub_lane_reading = rospy.Subscriber("~lane_pose", LanePose, self.cbPose, queue_size=1)
@@ -54,7 +53,6 @@ class lane_controller(object):
         k_theta = rospy.get_param("~k_theta")
         d_thres = rospy.get_param("~d_thres")
         theta_thres = rospy.get_param("~theta_thres")
-        theta_thres = rospy.get_param("~theta_thres")
         d_offset = rospy.get_param("~d_offset")
 
         params_old = (self.v_bar,self.k_d,self.k_theta,self.d_thres,self.theta_thres, self.d_offset)
@@ -87,7 +85,7 @@ class lane_controller(object):
         rospy.loginfo("[%s] Shutdown" %self.node_name)
 
 
-    def publishCmd(self,car_cmd_msg):
+    def publishCmd(self, car_cmd_msg):
 
         #wheels_cmd_msg = WheelsCmdStamped()
         #wheels_cmd_msg.header.stamp = stamp
@@ -101,7 +99,7 @@ class lane_controller(object):
         self.pub_car_cmd.publish(car_cmd_msg)
         #self.pub_wheels_cmd.publish(wheels_cmd_msg)
 
-    def cbPose(self,lane_pose_msg):
+    def cbPose(self, lane_pose_msg):
         self.lane_reading = lane_pose_msg 
 
         cross_track_err = lane_pose_msg.d - self.d_offset

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-import rospy
-import numpy as np
+import rospy 
 from duckietown_msgs.msg import SegmentList, Segment
 
 class LaneFilterTesterNode(object):

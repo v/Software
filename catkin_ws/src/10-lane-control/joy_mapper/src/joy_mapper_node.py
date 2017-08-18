@@ -4,7 +4,6 @@ import numpy as np
 import math
 from duckietown_msgs.msg import  Twist2DStamped, BoolStamped
 from sensor_msgs.msg import Joy
-import time
 from __builtin__ import True
 
 class JoyMapper(object):
@@ -15,7 +14,6 @@ class JoyMapper(object):
         self.joy = None
         self.last_pub_msg = None
         self.last_pub_time = rospy.Time.now()
-
 
         # Setup Parameters
         self.v_gain = self.setupParam("~speed_gain", 0.41)
@@ -47,7 +45,6 @@ class JoyMapper(object):
         pub_msg.data = self.state_parallel_autonomy
         pub_msg.header.stamp = self.last_pub_time
         self.pub_parallel_autonomy.publish(pub_msg)
-        
 
     def cbParamTimer(self,event):
         self.v_gain = rospy.get_param("~speed_gain", 1.0)
