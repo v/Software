@@ -1,4 +1,4 @@
-# What the duck! {#what-the-duck}
+# Package `what-the-duck` {#what-the-duck}
 
 `what-the-duck` is a program that tests *dozens* of configuration
 inconsistencies that can happen on a Duckiebot.

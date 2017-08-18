@@ -1,13 +1,18 @@
+# Mouse as encoder
+
 Use a mouse as encoder. Requires read permission to `/dev/input/mice`.
 
-# Publish Topic
+## Publish Topic
+
 * `mouse_encoder/tick`: `geometry_msg/Point` message with number of ticks in the x and y direction.
 
-# Parameters
+## Parameters
+
 * `~dev_path`: Default to `/dev/input/mice`. Point to the device path of the mouse.
 
-# Getting access to `/dev/input/mice`.
-* Create a group named `input` 
+## Getting access to `/dev/input/mice`.
+
+* Create a group named `input`
 ```
 $ sudo groupadd input
 ```
