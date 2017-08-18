@@ -8,3 +8,4 @@ catkin_ws/src/duckietown/machines
 .pydevproject
 .settings/
 catkin_ws/src/core/duckietown/machines
+catkin_ws/src/00-infrastructure/duckietown/machines
