@@ -327,14 +327,7 @@ You will need to add the option, and also remove the "~/.ssh/known_hosts" file.
         'Existence of machines file',
         MachinesExists(),
         Diagnosis('You have an invalid or missing machines file.'),
-        Suggestion("""
-
-To fix this, run:
-
-    $ rosrun duckietown create-machines-file
-        
-        
-""")
+        SeeDocs('machines'),
         )
     
     if this_is_a_duckiebot:
@@ -395,11 +388,11 @@ To fix this, run:
                 Diagnosis('Something invalid for package %s.' % package_name))
             
         
-    # make sure we resolve the paths  
-    # /opt/ros/kinetic/bin/roslaunch
     
     
-    # DISPLAY is not set
+    # TODO: DISPLAY is not set
+    
+    # TODO: date
     return entries
 
 def make_list(s):

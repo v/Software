@@ -13,8 +13,8 @@ class DuckietownConstants():
     scuderia_filename = 'scuderia.yaml'
     machines_path_rel_to_root = 'catkin_ws/src/00-infrastructure/duckietown/machines'
     
-    enforce_no_tabs = False
-    enforce_naming_conventions = False
+    enforce_no_tabs = True
+    enforce_naming_conventions = True
 
     
 def get_duckietown_root():
