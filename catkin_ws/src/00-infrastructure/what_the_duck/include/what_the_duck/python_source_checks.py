@@ -31,7 +31,7 @@ class PythonPackageCheck(Check):
                         check_good_name(filename)
                     
                 except CheckFailed as e:
-                    l = 'Fail for %s' % filename + '\n' + str(e.long_explanation)
+                    l = 'Check failed for file:\n    %s' % filename + '\n' + str(e.long_explanation)
                     raise CheckFailed(e.compact, l)
                     raise
 #                     fn = os.path.relpath(filename, self.dirname)
@@ -113,4 +113,4 @@ def check_no_tabs(filename):
         l = 'The tab characters are evil in Python code.'
         l += '\nPlease be *very* careful in changing them.'
         l += '\nDo *not* use a tool to do it (e.g. "Convert tabs to spaces"); it will get it wrong!' 
-        raise CheckFailed(msg)
+        raise CheckFailed(msg, l)
