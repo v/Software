@@ -45,8 +45,36 @@ class EasyNode():
         c2 = load_configuration_package_node(self.package_name, self.node_type_name)
         self._configuration = merge_configuration(c1, c2)
         self._init_parameters()
+        self._init_subscriptions()
         self.info(self._configuration)
         
+    def _init_subscriptions(self):
+        subscriptions = self._configuration.subscriptions
+        class Publishers():
+            pass
+        self.publishers = Publishers()
+        for s in subscriptions.values():
+            class Callback():
+                def __init__(self, node, s):
+                    self.node = node
+                    self.s = s
+                def __call__(self, data):
+                    self.node._sub_callback(self.s, data)
+                    
+            callback = Callback(self, s)
+            self.info('Subscribed to %s')
+            S = rospy.Subscriber(s.topic, s.type, callback, queue_size=s.queue_size)  # @UnusedVariable @UndefinedVariable
+            setattr(self.publishers, s.name, S)
+            
+    def _sub_callback(self, subscription, data):
+#         self.info('Message %s' % subscription.name)
+        callback_name = 'on_received_%s' % subscription.name
+        if hasattr(self, callback_name):
+            c = getattr(self, callback_name)
+            c(data)
+        else:
+            self.info('No callback %r' % callback_name)
+    
     def _init_parameters(self):
         parameters = self._configuration.parameters
         self.info('Loading %d parameters' % len(parameters))

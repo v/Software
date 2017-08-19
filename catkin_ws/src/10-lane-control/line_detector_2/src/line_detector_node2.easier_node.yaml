@@ -21,9 +21,8 @@ parameters:
         desc: Whether the node is verbose or not.
         type: bool
         default: true
-    image_size:
-        type: int
-        default: 100
+    img_size:
+        type: any
         desc: 
     top_cutoff:
         type: int

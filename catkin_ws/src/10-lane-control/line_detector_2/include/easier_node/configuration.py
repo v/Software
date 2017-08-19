@@ -16,6 +16,8 @@ __all__ = [
 
 EasyNodeConfig = namedtuple('EasyNodeConfig', 'parameters subscriptions contracts')
 EasyNodeParameter = namedtuple('EasyNodeParameter', 'name desc type has_default default')
+EasyNodeSubscription = namedtuple('EasyNodeSubscription', 'name desc type topic queue_size')
+
 # type = int, bool, float, or None (anything)
 DEFAULT_NOT_GIVEN = 'default-not-given'
 
@@ -61,20 +63,25 @@ def load_configuration(realpath, contents):
         raise  DTConfigException(msg)
     
 def load_configuration_parameters(data):
+    res = {}
+    for k, v in data.items():
+        check_good_name(k)
+        res[k] = load_configuration_parameter(k, v) 
+    return res
+
+def load_configuration_subscriptions(data):
+    res = {}
+    for k, v in data.items():
+        check_good_name(k)
+        res[k] = load_configuration_subscription(k, v) 
+    return res
+
+def load_configuration_parameter(name, data):
 #     verbose:
 #         desc: Whether the node is verbose or not.
 #         type: bool
 #         default: true
 #     
-    res = {}
-    for k, v in data.items():
-        check_good_name(k)
-        res[k] = load_configuration_parameter(k, v)
-        
-    return res
-
-
-def load_configuration_parameter(name, data):
     desc = data.pop('desc', None)
     type_ = data.pop('type')
     
@@ -104,14 +111,53 @@ def load_configuration_parameter(name, data):
     if has_default and default is not None and T is not None:
         default = T(default) 
     
-    return EasyNodeParameter(name=name, desc=desc, type=T, has_default=has_default, default=default)
+    return EasyNodeParameter(name=name, desc=desc, type=T, 
+                             has_default=has_default, default=default)
 
 def check_good_name(k):
     # TODO
     pass
 
-def load_configuration_subscriptions(data):
-    return {}
+def load_configuration_subscription(name, data):
+#      image:
+#         desc: Image to read
+#         topic: ~image
+#         type: CompressedImage
+#         queue_size: 1
+    try:
+        desc = data.pop('desc', None)
+        topic = data.pop('topic')
+        type_ = data.pop('type')
+        queue_size = data.pop('queue_size', None)
+    except KeyError as e:
+        msg = 'Could not find field %r.' % e
+        raise DTConfigException(msg)
+    
+    if data:
+        msg = 'Extra keys: %r' % data
+        raise DTConfigException(msg)
+    
+    from sensor_msgs.msg import CompressedImage, Image  # @UnresolvedImport
+    from duckietown_msgs.msg import (AntiInstagramTransform, BoolStamped, Segment, SegmentList, Vector2D)  # @UnresolvedImport
+    
+    # TODO: do this with reflection
+    type2T = {
+        'CompressedImage': CompressedImage,
+        'BoolStamped': BoolStamped,
+        'Image': Image,
+        'AntiInstagramTransform': AntiInstagramTransform,
+        'Vector2D': Vector2D,
+        'SegmentList': SegmentList,
+        'Segment': Segment,
+    }
+    
+    if not type_ in type2T:
+        raise NotImplementedError(type_)
+    
+    T = type2T[type_]  
+    
+    return EasyNodeSubscription(name=name, desc=desc,  topic=topic,
+                                type=T, queue_size=queue_size)
 
 def load_configuration_contracts(data):
     return {}
