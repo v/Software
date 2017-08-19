@@ -1,0 +1,42 @@
+
+subscriptions:
+    image:
+        desc: Image to read
+        topic: ~image
+        type: CompressedImage
+        queue_size: 1
+    transform:
+        desc: The anti-instagram transform to apply.
+        topic: ~transform
+        type: AntiInstagramTransform
+        queue_size: 1
+    switch:
+        desc: null
+        topic: ~switch
+        type: BoolStamped
+        queue_size: 1
+
+parameters:
+    verbose:
+        desc: Whether the node is verbose or not.
+        type: bool
+        default: true
+    image_size:
+        type: int
+        default: 100
+        desc: 
+    top_cutoff:
+        type: int
+        default: 
+        desc: 
+    detector:
+        type: any
+        desc: Detector instantiation
+
+contracts:
+    subscriptions:
+        image:
+            min_frequency: 5
+    processing:
+        image:
+            max_latency: 0.200
