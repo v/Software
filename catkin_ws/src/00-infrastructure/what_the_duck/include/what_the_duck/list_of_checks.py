@@ -2,7 +2,8 @@
 from duckietown_utils import DuckietownConstants
 from duckietown_utils.constants import get_list_of_packages_in_catkin_ws
 from what_the_duck.entry import SeeDocs
-from what_the_duck.python_source_checks import PythonPackageCheck
+from what_the_duck.python_source_checks import PythonPackageCheck,\
+    add_python_package_checks
 
 from .checks import *  # @UnusedWildImport
 from .detect_environment import on_duckiebot
@@ -156,6 +157,7 @@ def get_checks():
             python-termcolor
             ros-kinetic-desktop-full
             ntpdate
+            ipython
         """))
 
     if this_is_a_duckiebot:
@@ -341,7 +343,7 @@ def get_checks():
         Diagnosis('Scuderia was modified after machines created'),
         )
 
-    if False: # TODO
+    if True: # TODO
 
         if this_is_a_laptop:
 
@@ -356,6 +358,17 @@ def get_checks():
        (containing a subdirectory 'logs')
     """
                       ))
+            
+            logs = [
+                "${DUCKIETOWN_DATA}/logs/20160400-phase3-logs/dp45/20160406/20160406-226-All_red_lights_followTheLeader1-2cv.bag",
+            ]
+            for l in logs:
+                add(existence, 
+                    'Log %r exists in DUCKIETOWN_DATA' % os.path.basename(l),
+                    FileExists(l),
+                    Diagnosis("The DUCKIETOWN_DATA folder does not contain the logs it should.")
+                    )
+            
 
     if False:
         # TODO: not sure if this is needed
@@ -378,13 +391,15 @@ def get_checks():
         pass
     else:
         for package_name, dirname in packagename2dir.items():
-            c = PythonPackageCheck(package_name, dirname)
-            add(None,
-                'Package %s' % package_name,
-                c,
-                Diagnosis('Something invalid for package %s.' % package_name))
-
+            add_python_package_checks(add, package_name, dirname)
+            
     # TODO: DISPLAY is not set
+    # files in src/ or scripts/ are executable
+    # There is no file "util.py" copied from pkg_name
+
+#     add(None,
+#         'Passwordless sudo',
+#         FileContains('/etc/'))
 
     # TODO: date
     return entries
