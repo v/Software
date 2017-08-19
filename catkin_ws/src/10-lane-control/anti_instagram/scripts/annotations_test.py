@@ -108,7 +108,6 @@ def examine_dataset(dirname, out):
         shape = (200, 160)
         interpolation = cv2.INTER_NEAREST
 
-
         bn = os.path.splitext(os.path.basename(j))[0]
         fn = os.path.join(out, '%s.all.png' % (bn))
 
@@ -393,7 +392,10 @@ def anti_instagram_annotations_test():
     for d in dirs:
         import getpass
         uname = getpass.getuser()
-        out = os.path.join(os.path.dirname(d), uname, os.path.basename(d) + '.v')
+        
+        out_base = 'anti_instagram_annotations_test'
+        out = os.path.join(out_base, os.path.basename(d) + '.v')
+#         out = os.path.join(os.path.dirname(d), uname, os.path.basename(d) + '.v')
         if not os.path.exists(out):
             os.makedirs(out)
         results=examine_dataset(d, out)

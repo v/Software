@@ -14,7 +14,8 @@ To run manually, use:
     $ rostest anti_instagram antiinstagram_performance_test.test
 
 
-## Other unit tests
+## Unit tests needed external files
 
+These are other unittest that require the logs in DUCKIETOWN_DATA:
 
     $ rosrun anti_instagram annotations_test.py
