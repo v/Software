@@ -390,8 +390,8 @@ def anti_instagram_annotations_test():
         raise ValueError('No IIDS1 directories')
 
     for d in dirs:
-        import getpass
-        uname = getpass.getuser()
+#         import getpass
+#         uname = getpass.getuser()
         
         out_base = 'anti_instagram_annotations_test'
         out = os.path.join(out_base, os.path.basename(d) + '.v')
