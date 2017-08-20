@@ -49,7 +49,8 @@ build:
 .PHONY: unittests-environment
 
 unittests-environment:
-	-./what-the-duck
+	# 
+	#-./what-the-duck
 
 unittests: unittests-environment
 	bash -c "source environment.sh; catkin_make -C $(catkin_ws) run_tests; catkin_test_results $(catkin_ws)/build/test_results/"
