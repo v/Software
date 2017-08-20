@@ -48,6 +48,8 @@ def generate_easy_node_docs():
             else:
                 logger.info('already up to date %s' % out)
 
+def write_desc(x):
+    return 'TODO: Missing description for entry "%s".' % x.name
 
 # @contract(config=EasyNodeConfig)
 def generate_configuration(config):
@@ -66,6 +68,9 @@ def generate_configuration(config):
         md += '\n\n'
         if param.desc:
             md += param.desc
+        else:
+            md += write_desc(param)
+            
         md += '\n\n'
 #         md += '</div>\n\n'
 
@@ -79,6 +84,9 @@ def generate_configuration(config):
 
         if subscription.desc:
             md += subscription.desc
+        else:
+            md += write_desc(subscription)
+
         md += '\n\n'
 
         if subscription.process == PROCESS_THREADED:
@@ -95,6 +103,9 @@ def generate_configuration(config):
         md += 'topic `%s` (%s)\n\n' % (publisher.topic, describe_type(publisher.type))
         if publisher.desc:
             md += publisher.desc
+        else:
+            md += write_desc(publisher)
+
         md += '\n\n'
 
 
