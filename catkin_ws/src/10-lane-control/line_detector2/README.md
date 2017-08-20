@@ -67,8 +67,10 @@ Sample output:
 The output from `rviz` looks like [](#fig:line_detector_output).
 
 <div figure-id="fig:line_detector_output">
-    <img src='line_detector_output.jpg'/>
+    <img src='line_detector_screen.jpg'/>
 </div>
+
+
 
 ## Quantitative tests
 

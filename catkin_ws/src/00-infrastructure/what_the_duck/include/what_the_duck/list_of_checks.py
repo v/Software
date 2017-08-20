@@ -157,8 +157,15 @@ def get_checks():
             python-termcolor
             ros-kinetic-desktop-full
             ntpdate
+
+
             ipython
             python-ruamel.yaml
+            virtualenv
+            libxml2-dev libxslt1-dev
+            libffi-dev
+            bibtex2html
+            pdftk
         """))
 
     if this_is_a_duckiebot:
