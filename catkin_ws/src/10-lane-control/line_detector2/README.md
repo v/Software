@@ -1,7 +1,7 @@
-# Package `line_detector` {#line_detector}
+# Package `line_detector2` {#line_detector2}
 
-TODO: to write
-
+This is a re-implementation of the package [`line_detector`](#line_detector)
+using the new facilities provided by [`easy_node`](#easy_node).
 
 
 ## Testing the line detector using visual inspection
