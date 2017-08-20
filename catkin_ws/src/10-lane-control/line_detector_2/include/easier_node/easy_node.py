@@ -3,6 +3,10 @@ import rospy
 from duckietown_utils.exceptions import DTConfigException
 
 from .configuration import load_configuration_package_node, merge_configuration
+from easier_node.configuration import PROCESS_THREADED, PROCESS_SYNCHRONOUS
+import threading
+from easier_node.timing import ProcessingTimingStats
+from contextlib import contextmanager
 
 
 __all__ = [
@@ -46,35 +50,107 @@ class EasyNode():
         self._configuration = merge_configuration(c1, c2)
         self._init_parameters()
         self._init_subscriptions()
+        self._init_publishers()
         self.info(self._configuration)
         
     def _init_subscriptions(self):
         subscriptions = self._configuration.subscriptions
+        class Subscribers():
+            pass
+        self.subscribers = Subscribers()
+        class SubscriberProxy():
+            def __init__(self, sub):
+                self.sub = sub
+                self.pts = ProcessingTimingStats()
+            def init_threaded(self):
+                self.thread_lock = threading.Lock()
+                 
+        class Callback():
+            def __init__(self, node, subscription):
+                self.node = node
+                self.subscription = subscription 
+            def __call__(self, data):
+                subscriber_proxy = getattr(self.node.subscribers, self.subscription.name)
+                self.node._sub_callback(self.subscription, subscriber_proxy, data)
+
+        for s in subscriptions.values():
+            callback = Callback(node=self, subscription=s)
+            S = rospy.Subscriber(s.topic, s.type, callback, queue_size=s.queue_size)  # @UndefinedVariable
+            sp = SubscriberProxy(S)
+            setattr(self.subscribers, s.name, sp)
+            
+            self.info('Subscribed to %s')
+            if s.process == PROCESS_THREADED:
+                sp.init_threaded()
+            
+    def _sub_callback(self, subscription, subscriber_proxy, data):
+        subscriber_proxy.pts.received_message(data)
+        
+        callback_name = 'on_received_%s' % subscription.name
+        if hasattr(self, callback_name):
+            if subscription.process == PROCESS_SYNCHRONOUS:
+                # Call directly
+                subscriber_proxy.pts.decided_to_process()
+                self._call_callback(callback_name, subscription, data)
+            elif subscription.process == PROCESS_THREADED:
+                # Start a daemon thread to process the image
+                target = self._sub_callback_threaded
+                args = (callback_name, subscription, subscriber_proxy, data)
+                thread = threading.Thread(target=target, args=args)
+                thread.setDaemon(True)
+                thread.start()
+            else:
+                assert False, subscription.process
+        else:
+            subscriber_proxy.pts.decided_to_skip()
+            self.info('No callback %r defined.' % callback_name)
+    
+    def _get_context(self, subscription):
+        class Context():
+            def __init__(self, node, subscription):
+                self.node = node
+                self.subscription = subscription
+                self.sp = getattr(node.subscribers, subscription.name) 
+            @contextmanager
+            def phase(self, name): 
+                with self.sp.pts.phase(name):
+                    yield   
+                    
+            def get_stats(self):
+                return self.sp.pts.get_stats()
+            
+        context = Context(self, subscription)
+        return context
+            
+    def _sub_callback_threaded(self, callback_name, subscription, subscriber_proxy, data):
+        if not subscriber_proxy.thread_lock.acquire(False):
+            # TODO self.stats.skipped()
+            subscriber_proxy.pts.decided_to_skip()
+            return
+        try:
+            subscriber_proxy.pts.decided_to_process()
+            self._call_callback(callback_name, subscription, data)
+        finally:
+            # Release the thread lock
+            subscriber_proxy.thread_lock.release()
+            
+    def _call_callback(self, callback_name, subscription, data):
+        c = getattr(self, callback_name)
+        context = self._get_context(subscription)
+        try:
+            c(context, data)
+        finally:
+            pass
+        
+    def _init_publishers(self):
+        publishers = self._configuration.publishers
         class Publishers():
             pass
         self.publishers = Publishers()
-        for s in subscriptions.values():
-            class Callback():
-                def __init__(self, node, s):
-                    self.node = node
-                    self.s = s
-                def __call__(self, data):
-                    self.node._sub_callback(self.s, data)
-                    
-            callback = Callback(self, s)
-            self.info('Subscribed to %s')
-            S = rospy.Subscriber(s.topic, s.type, callback, queue_size=s.queue_size)  # @UnusedVariable @UndefinedVariable
-            setattr(self.publishers, s.name, S)
+        for s in publishers.values():
+            P = rospy.Publisher(s.topic, s.type, queue_size=s.queue_size)  # @UndefinedVariable
+            setattr(self.publishers, s.name, P)
             
-    def _sub_callback(self, subscription, data):
-#         self.info('Message %s' % subscription.name)
-        callback_name = 'on_received_%s' % subscription.name
-        if hasattr(self, callback_name):
-            c = getattr(self, callback_name)
-            c(data)
-        else:
-            self.info('No callback %r' % callback_name)
-    
     def _init_parameters(self):
         parameters = self._configuration.parameters
         self.info('Loading %d parameters' % len(parameters))
@@ -127,7 +203,7 @@ class EasyNode():
             s1 = current.__repr__()
             s2 = val.__repr__()
             if s1 != s2:
-                self.info('change from\n%s\n\nto\n\n%s' % (s1,s2))
+                # self.info('change from\n%s\n\nto\n\n%s' % (s1,s2))
                 changed[p.name] = current
         return changed
     
@@ -136,6 +212,3 @@ class EasyNode():
         self._init()
         self.on_init()
         rospy.spin()  # @UndefinedVariable
-        
-
-        

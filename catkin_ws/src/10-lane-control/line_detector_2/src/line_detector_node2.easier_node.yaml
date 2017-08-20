@@ -1,21 +1,14 @@
+version: 1
 
-subscriptions:
-    image:
-        desc: Image to read
-        topic: ~image
-        type: CompressedImage
-        queue_size: 1
-    transform:
-        desc: The anti-instagram transform to apply.
-        topic: ~transform
-        type: AntiInstagramTransform
-        queue_size: 1
-    switch:
-        desc: null
-        topic: ~switch
-        type: BoolStamped
-        queue_size: 1
+# inherit:
+# - easier_node:easier_node
 
+#description: |
+#    This is a replacement 
+
+#base_class:
+#    line_detector2.Andrea
+  
 parameters:
     verbose:
         desc: Whether the node is verbose or not.
@@ -27,10 +20,53 @@ parameters:
     top_cutoff:
         type: int
         default: 
-        desc: 
+        desc: How much of the image we should cut off.
     detector:
         type: any
         desc: Detector instantiation
+
+subscriptions:
+    image:
+        desc: Image to read
+        topic: ~image
+        type: CompressedImage
+        queue_size: 1
+        process: threaded
+    transform:
+        desc: The anti-instagram transform to apply.
+        topic: ~transform
+        type: AntiInstagramTransform
+        queue_size: 1
+        process: synchronous
+    switch:
+        desc: null
+        topic: ~switch
+        type: BoolStamped
+        queue_size: 1
+        process: synchronous
+
+publishers:
+    edge:
+        desc: 
+        type: Image
+        queue_size: 1
+        topic: ~edge
+    color_segment:
+        desc:
+        type: Image
+        queue_size: 1
+        topic: ~colorSegment
+    segment_list:
+        desc:
+        type: SegmentList
+        queue_size: 1
+        topic: ~segment_list
+    image_with_lines:
+        desc:
+        type: Image
+        queue_size: 1
+        topic: ~image_with_lines
+
 
 contracts:
     subscriptions:
