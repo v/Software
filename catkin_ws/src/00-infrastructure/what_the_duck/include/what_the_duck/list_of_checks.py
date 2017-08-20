@@ -158,6 +158,7 @@ def get_checks():
             ros-kinetic-desktop-full
             ntpdate
             ipython
+            python-ruamel.yaml
         """))
 
     if this_is_a_duckiebot:
@@ -358,17 +359,17 @@ def get_checks():
        (containing a subdirectory 'logs')
     """
                       ))
-            
+
             logs = [
                 "${DUCKIETOWN_DATA}/logs/20160400-phase3-logs/dp45/20160406/20160406-226-All_red_lights_followTheLeader1-2cv.bag",
             ]
             for l in logs:
-                add(existence, 
+                add(existence,
                     'Log %r exists in DUCKIETOWN_DATA' % os.path.basename(l),
                     FileExists(l),
                     Diagnosis("The DUCKIETOWN_DATA folder does not contain the logs it should.")
                     )
-            
+
 
     if False:
         # TODO: not sure if this is needed
@@ -392,7 +393,7 @@ def get_checks():
     else:
         for package_name, dirname in packagename2dir.items():
             add_python_package_checks(add, package_name, dirname)
-            
+
     # TODO: DISPLAY is not set
     # files in src/ or scripts/ are executable
     # There is no file "util.py" copied from pkg_name

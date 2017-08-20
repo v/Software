@@ -10,7 +10,7 @@ class JoyMapper(object):
     def __init__(self):
         self.node_name = rospy.get_name()
         rospy.loginfo("[%s] Initializing " %(self.node_name))
-        
+
         self.joy = None
         self.last_pub_msg = None
         self.last_pub_time = rospy.Time.now()
@@ -32,7 +32,7 @@ class JoyMapper(object):
 
         # Subscriptions
         self.sub_joy_ = rospy.Subscriber("joy", Joy, self.cbJoy, queue_size=1)
-        
+
         # timer
         # self.pub_timer = rospy.Timer(rospy.Duration.from_sec(self.pub_timestep),self.publishControl)
         self.param_timer = rospy.Timer(rospy.Duration.from_sec(1.0),self.cbParamTimer)
@@ -78,7 +78,7 @@ class JoyMapper(object):
 # Button List index of joy.buttons array:
 # a = 0, b=1, x=2. y=3, lb=4, rb=5, back = 6, start =7,
 # logitek = 8, left joy = 9, right joy = 10
-
+# XXX: here we should use constants
     def processButtons(self, joy_msg):
         if (joy_msg.buttons[6] == 1): #The back button
             override_msg = BoolStamped()
@@ -112,18 +112,18 @@ class JoyMapper(object):
             e_stop_msg.header.stamp = self.joy.header.stamp
             e_stop_msg.data = True # note that this is toggle (actual value doesn't matter)
             self.pub_e_stop.publish(e_stop_msg)
-        elif (joy_msg.buttons[9] == 1): #push left joystick button 
+        elif (joy_msg.buttons[9] == 1): #push left joystick button
             avoidance_msg = BoolStamped()
             rospy.loginfo('start lane following with avoidance mode')
             avoidance_msg.header.stamp = self.joy.header.stamp
-            avoidance_msg.data = True 
+            avoidance_msg.data = True
             self.pub_avoidance.publish(avoidance_msg)
 
         else:
             some_active = sum(joy_msg.buttons) > 0
             if some_active:
                 rospy.loginfo('No binding for joy_msg.buttons = %s' % str(joy_msg.buttons))
-                                          
+
 
 if __name__ == "__main__":
     rospy.init_node("joy_mapper",anonymous=False)

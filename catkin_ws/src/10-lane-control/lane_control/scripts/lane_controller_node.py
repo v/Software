@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import rospy 
+import rospy
 import math
 from duckietown_msgs.msg import Twist2DStamped, LanePose
 
@@ -41,6 +41,7 @@ class lane_controller(object):
         d_offset = 0.0
 
         self.v_bar = self.setupParameter("~v_bar",v_bar) # Linear velocity
+        # FIXME: AC aug'17: are these inverted?
         self.k_d = self.setupParameter("~k_d",k_theta) # P gain for theta
         self.k_theta = self.setupParameter("~k_theta",k_d) # P gain for d
         self.d_thres = self.setupParameter("~d_thres",theta_thres) # Cap for error in d
@@ -69,10 +70,10 @@ class lane_controller(object):
             self.theta_thres = theta_thres
             self.d_offset = d_offset
 
-    
+
     def custom_shutdown(self):
         rospy.loginfo("[%s] Shutting down..." %self.node_name)
-        
+
         # Stop listening
         self.sub_lane_reading.unregister()
 
@@ -100,7 +101,7 @@ class lane_controller(object):
         #self.pub_wheels_cmd.publish(wheels_cmd_msg)
 
     def cbPose(self, lane_pose_msg):
-        self.lane_reading = lane_pose_msg 
+        self.lane_reading = lane_pose_msg
 
         cross_track_err = lane_pose_msg.d - self.d_offset
         heading_err = lane_pose_msg.phi
@@ -108,11 +109,11 @@ class lane_controller(object):
         car_control_msg = Twist2DStamped()
         car_control_msg.header = lane_pose_msg.header
         car_control_msg.v = self.v_bar #*self.speed_gain #Left stick V-axis. Up is positive
-        
+
         if math.fabs(cross_track_err) > self.d_thres:
             cross_track_err = cross_track_err / math.fabs(cross_track_err) * self.d_thres
         car_control_msg.omega =  self.k_d * cross_track_err + self.k_theta * heading_err #*self.steer_gain #Right stick H-axis. Right is negative
-        
+
         # controller mapping issue
         # car_control_msg.steering = -car_control_msg.steering
         # print "controls: speed %f, steering %f" % (car_control_msg.speed, car_control_msg.steering)

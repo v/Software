@@ -1,12 +1,12 @@
+from contextlib import contextmanager
 import rospy
+import threading
 
 from duckietown_utils.exceptions import DTConfigException
 
-from easy_node import load_configuration_package_node, merge_configuration
-from easy_node.configuration import PROCESS_THREADED, PROCESS_SYNCHRONOUS
-import threading
-from easy_node.timing import ProcessingTimingStats
-from contextlib import contextmanager
+from .configuration import PROCESS_THREADED, PROCESS_SYNCHRONOUS
+from .configuration import load_configuration_package_node, merge_configuration
+from .timing import ProcessingTimingStats
 
 
 __all__ = [
@@ -148,7 +148,7 @@ class EasyNode():
             pass
         self.publishers = Publishers()
         for s in publishers.values():
-            P = rospy.Publisher(s.topic, s.type, queue_size=s.queue_size)  # @UndefinedVariable
+            P = rospy.Publisher(s.topic, s.type, queue_size=s.queue_size, latch=s.latch)  # @UndefinedVariable
             setattr(self.publishers, s.name, P)
             
     def _init_parameters(self):
@@ -170,6 +170,9 @@ class EasyNode():
                 except KeyError:
                     msg = 'Could not load required parameter %r.' % p.name
                     raise DTConfigException(msg)
+            
+            # write to parameter server, for transparency
+            rospy.set_param(name, val)  # @UndefinedVariable
                 
             setattr(self.config, p.name, val)
             self.info('Read %r = %r' % (p.name, val))
