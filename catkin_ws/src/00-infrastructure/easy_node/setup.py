@@ -5,7 +5,7 @@ from catkin_pkg.python_setup import generate_distutils_setup
 
 # fetch values from package.xml
 setup_args = generate_distutils_setup(
-    packages=['line_detector2'],
+    packages=['easy_node'],
     package_dir={'': 'include'},
 )
 

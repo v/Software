@@ -1,14 +1,15 @@
-import numpy as np
 import cv2
 
 from anti_instagram.AntiInstagram import AntiInstagram
-from cv_bridge import CvBridge
-from duckietown_msgs.msg import (Segment, SegmentList)
+from cv_bridge import CvBridge  # @UnresolvedImport
+from duckietown_msgs.msg import (Segment, SegmentList)  # @UnresolvedImport
 from duckietown_utils.instantiate_utils import instantiate
 from duckietown_utils.jpg import image_cv_from_jpg
 from duckietown_utils.text_utils import indent
-from easier_node.easy_node import EasyNode 
-from line_detector.line_detector_plot import drawLines, color_segment
+from easy_node import EasyNode
+import numpy as np
+
+from .plotting import drawLines, color_segment
 
 
 class LineDetectorNode2(EasyNode):
@@ -56,8 +57,7 @@ class LineDetectorNode2(EasyNode):
                 image_cv = image_cv_from_jpg(image_msg.data)
             except ValueError as e:
                 self.loginfo('Could not decode image: %s' % e)
-                return
- 
+                return 
 
         with context.phase('resizing'):
             # Resize and crop image
@@ -92,7 +92,8 @@ class LineDetectorNode2(EasyNode):
     
             # Convert to normalized pixel coordinates, and add segments to segmentList
             arr_cutoff = np.array((0, self.config.top_cutoff, 0, self.config.top_cutoff))
-            arr_ratio = np.array((1./ self.config.img_size[1], 1./ self.config.img_size[0], 1./ self.config.img_size[1], 1./ self.config.img_size[0]))
+            s0, s1 = self.config.img_size[0],  self.config.img_size[1]
+            arr_ratio = np.array((1./ s1, 1./ s0, 1./ s1, 1./ s0))
             if len(white.lines) > 0:
                 lines_normalized_white = ((white.lines + arr_cutoff) * arr_ratio)
                 segmentList.segments.extend(toSegmentMsg(lines_normalized_white, white.normals, Segment.WHITE))
