@@ -1,0 +1,23 @@
+camera_matrix:
+  cols: 3
+  data: [339.174627275142, 0.0, 307.5983555383631, 0.0, 336.2079057436804, 255.8607923412618,
+    0.0, 0.0, 1.0]
+  rows: 3
+camera_name: ata/camera_node
+distortion_coefficients:
+  cols: 5
+  data: [-0.25111008985729216, 0.05118594572286357, 0.0025287237563787904, -0.0059183737656329435,
+    0.0]
+  rows: 1
+distortion_model: plumb_bob
+image_height: 480
+image_width: 640
+projection_matrix:
+  cols: 4
+  data: [246.75726318359375, 0.0, 290.079850314185, 0.0, 0.0, 282.57550048828125,
+    265.1569334628002, 0.0, 0.0, 0.0, 1.0, 0.0]
+  rows: 3
+rectification_matrix:
+  cols: 3
+  data: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+  rows: 3
