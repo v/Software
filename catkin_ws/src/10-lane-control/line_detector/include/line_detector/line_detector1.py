@@ -51,7 +51,7 @@ class LineDetectorHSV(Configurable, LineDetectorInterface):
         # binary dilation
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(self.dilation_kernel_size, self.dilation_kernel_size))
         bw = cv2.dilate(bw, kernel)
-        
+
         # refine edge for certain color
         edge_color = cv2.bitwise_and(bw, self.edges)
 
@@ -68,7 +68,7 @@ class LineDetectorHSV(Configurable, LineDetectorInterface):
         else:
             lines = []
         return lines
-    
+
     def _checkBounds(self, val, bound):
         val[val<0]=0
         val[val>=bound]=bound-1
@@ -79,8 +79,8 @@ class LineDetectorHSV(Configurable, LineDetectorInterface):
         for i in range(len(lines)):
             if flag[i]:
                 x1,y1,x2,y2 = lines[i, :]
-                lines[i, :] = [x2,y2,x1,y1] 
- 
+                lines[i, :] = [x2,y2,x1,y1]
+
     def _findNormal(self, bw, lines):
         normals = []
         centers = []
@@ -100,8 +100,8 @@ class LineDetectorHSV(Configurable, LineDetectorInterface):
             y4 = self._checkBounds(y4, bw.shape[0])
             flag_signs = (np.logical_and(bw[y3,x3]>0, bw[y4,x4]==0)).astype('int')*2-1
             normals = np.hstack([dx, dy]) * flag_signs
- 
-            """ # Old code with lists and loop, performs 4x slower 
+
+            """ # Old code with lists and loop, performs 4x slower
             for cnt,line in enumerate(lines):
                 x1,y1,x2,y2 = line
                 dx = 1.*(y2-y1)/((x1-x2)**2+(y1-y2)**2)**0.5
@@ -115,7 +115,7 @@ class LineDetectorHSV(Configurable, LineDetectorInterface):
                 x4 = self._checkBounds(x4, bw.shape[1])
                 y4 = self._checkBounds(y4, bw.shape[0])
                 if bw[y3,x3]>0 and bw[y4,x4]==0:
-                    normals[cnt,:] = [dx, dy] 
+                    normals[cnt,:] = [dx, dy]
                 else:
                     normals[cnt,:] = [-dx, -dy]
             """
@@ -128,10 +128,14 @@ class LineDetectorHSV(Configurable, LineDetectorInterface):
         centers, normals = self._findNormal(bw, lines)
         return Detections(lines=lines, normals=normals, area=bw, centers=centers)
 
+    def detectLines2(self, color):
+        bw, edge_color = self._colorFilter(color)
+        return bw
+
     def setImage(self, bgr):
         self.bgr = np.copy(bgr)
         self.hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
         self.edges = self._findEdge(self.bgr)
-  
+
     def getImage(self):
         return self.bgr
